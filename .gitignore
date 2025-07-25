@@ -94,7 +94,10 @@ dist
 
 # Gatsby files
 .cache/
-public
+# Only ignore Gatsby public build folder, not React pages
+**/public/build/
+**/public/static/
+.cache/
 
 # Storybook build outputs
 .out

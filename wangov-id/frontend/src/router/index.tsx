@@ -40,6 +40,10 @@ import LoginPage from '../pages/public/LoginPage';
 import GovLoginPage from '../pages/public/GovLoginPage';
 import OrgLoginPage from '../pages/public/OrgLoginPage';
 import RegisterPage from '../pages/public/RegisterPage';
+import RegistrationChoice from '../pages/public/RegistrationChoice';
+import CitizenRegistration from '../pages/public/CitizenRegistration';
+import ResidentPermitRegistration from '../pages/public/ResidentPermitRegistration';
+import RegistrationConfirmation from '../pages/public/RegistrationConfirmation';
 
 // Citizen Pages
 import CitizenDashboard from '../pages/citizen/CitizenDashboard';
@@ -218,7 +222,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/register",
-        element: <PublicRoute><RegisterPage /></PublicRoute>,
+        element: <PublicRoute><RegistrationChoice /></PublicRoute>,
+      },
+      {
+        path: "/register/citizen",
+        element: <PublicRoute><CitizenRegistration /></PublicRoute>,
+      },
+      {
+        path: "/register/resident-permit",
+        element: <PublicRoute><ResidentPermitRegistration /></PublicRoute>,
+      },
+      {
+        path: "/register/confirmation",
+        element: <PublicRoute><RegistrationConfirmation /></PublicRoute>,
       },
     ],
   },
