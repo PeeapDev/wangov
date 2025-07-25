@@ -1,0 +1,27 @@
+{
+  "name": "wangov-project",
+  "version": "1.0.0",
+  "description": "WanGov Digital ID System - Full Stack Application",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd wangov-id && npm run dev",
+    "frontend:dev": "cd wangov-id/frontend && npm run dev",
+    "backend:start": "cd wangov-id && npm start",
+    "frontend:build": "cd wangov-id/frontend && npm run build",
+    "install:all": "npm install && cd wangov-id && npm install && cd frontend && npm install",
+    "prisma:generate": "cd wangov-id && npm run prisma:generate",
+    "prisma:migrate": "cd wangov-id && npm run prisma:migrate",
+    "prisma:seed": "cd wangov-id && npm run prisma:seed",
+    "build": "npm run frontend:build && cd wangov-id && npm run build",
+    "start": "concurrently \"npm run backend:start\" \"npm run frontend:preview\"",
+    "frontend:preview": "cd wangov-id/frontend && npm run preview"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

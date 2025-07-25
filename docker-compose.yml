@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # WanGov-ID: Core Backend API Service
+  wangov-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wangov-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@wangov-db:5432/wangovid
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET:-your-super-secret-admin-jwt-key-change-in-production}
+      - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-session-key-change-in-production}
+    depends_on:
+      - wangov-db
+      - wangov-redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # SuperAdmin Dashboard Service
+  wangov-superadmin:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - ROLE=superadmin
+    container_name: wangov-superadmin
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    environment:
+      - REACT_APP_API_URL=http://wangov-api:3000/api
+      - REACT_APP_ROLE=superadmin
+    depends_on:
+      - wangov-api
+
+  # Admin Dashboard Service
+  wangov-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - ROLE=admin
+    container_name: wangov-admin
+    restart: unless-stopped
+    ports:
+      - "3002:80"
+    environment:
+      - REACT_APP_API_URL=http://wangov-api:3000/api
+      - REACT_APP_ROLE=admin
+    depends_on:
+      - wangov-api
+
+  # Organization Dashboard Service
+  wangov-organization:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - ROLE=organization
+    container_name: wangov-organization
+    restart: unless-stopped
+    ports:
+      - "3003:80"
+    environment:
+      - REACT_APP_API_URL=http://wangov-api:3000/api
+      - REACT_APP_ROLE=organization
+    depends_on:
+      - wangov-api
+
+  # Citizen Dashboard Service
+  wangov-citizen:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - ROLE=citizen
+    container_name: wangov-citizen
+    restart: unless-stopped
+    ports:
+      - "3004:80"
+    environment:
+      - REACT_APP_API_URL=http://wangov-api:3000/api
+      - REACT_APP_ROLE=citizen
+    depends_on:
+      - wangov-api
+
+  # WanGov SSO Service
+  wangov-sso:
+    build:
+      context: ./wangov-sso
+      dockerfile: Dockerfile
+    container_name: wangov-sso
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - SESSION_SECRET=${SSO_SESSION_SECRET:-wangov-sso-super-secret-key}
+      - DB_HOST=wangov-db
+      - DB_PORT=5432
+      - DB_NAME=wangovid
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - OAUTH_ISSUER=http://sso.localhost:3004
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET:-wangov-oauth-secret-key}
+      - ENABLE_MOCK_DATA=true
+    depends_on:
+      - wangov-db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # WanGov-DB: Database Service
+  wangov-db:
+    image: postgres:14-alpine
+    container_name: wangov-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=wangovid
+    volumes:
+      - wangov-db-data:/var/lib/postgresql/data
+
+  # WanGov-Redis: Caching and Session Store
+  wangov-redis:
+    image: redis:alpine
+    container_name: wangov-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - wangov-redis-data:/data
+
+volumes:
+  wangov-db-data:
+  wangov-redis-data:

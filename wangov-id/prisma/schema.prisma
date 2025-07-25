@@ -1,0 +1,257 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Citizen model - core identity record
+model Citizen {
+  id                String            @id @default(uuid())
+  nid               String            @unique // National ID - 12-digit unique identifier (standardized format)
+  firstName         String
+  middleName        String?
+  lastName          String
+  dateOfBirth       DateTime
+  gender            Gender
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  contact           Json              // Structured contact info (email, phone, address)
+  biometricData     BiometricData?
+  credentials       Credentials?
+  authMethods       AuthMethod[]
+  consents          Consent[]
+  auditLogs         AuditLog[]
+  sessions          Session[]
+  documents         Document[]
+  serviceAccesses   ServiceAccess[]
+}
+
+// Biometric data linked to citizen
+model BiometricData {
+  id                String    @id @default(uuid())
+  citizenId         String    @unique
+  citizen           Citizen   @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  fingerprints      Json?     // Encrypted fingerprint templates
+  faceTemplate      Json?     // Encrypted facial recognition data
+  irisTemplate      Json?     // Encrypted iris scan data
+  voicePrint        Json?     // Encrypted voice biometric data
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  enrollmentDate    DateTime  @default(now())
+  quality           Json      // Quality metrics for each biometric
+  lastVerification  DateTime?
+}
+
+// Authentication credentials
+model Credentials {
+  id                String    @id @default(uuid())
+  citizenId         String    @unique
+  citizen           Citizen   @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  password          String?   // Hashed password using bcrypt
+  passwordUpdatedAt DateTime?
+  recoveryEmail     String?
+  recoveryPhone     String?
+  temporaryToken    String?
+  tokenExpiry       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  forceChange       Boolean   @default(false)
+  failedAttempts    Int       @default(0)
+  lockedUntil       DateTime?
+}
+
+// Authentication methods associated with a citizen
+model AuthMethod {
+  id                String    @id @default(uuid())
+  citizenId         String
+  citizen           Citizen   @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  type              AuthType
+  value             String    // Email, phone number, or device ID
+  isVerified        Boolean   @default(false)
+  verifiedAt        DateTime?
+  isPrimary         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([citizenId, type, value])
+}
+
+// Organization that can integrate with the ID system
+model Organization {
+  id                String       @id @default(uuid())
+  name              String
+  type              OrgType
+  apiKey            String       @unique
+  apiSecret         String
+  callbackUrl       String?
+  webhookUrl        String?
+  accessScope       String[]     // Array of allowed scopes
+  isActive          Boolean      @default(true)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  services          Service[]
+  serviceAccesses   ServiceAccess[]
+}
+
+// Service provided by an organization
+model Service {
+  id                String          @id @default(uuid())
+  name              String
+  description       String
+  organizationId    String
+  organization      Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requiredScopes    String[]
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  serviceAccesses   ServiceAccess[]
+}
+
+// Record of service access by citizens
+model ServiceAccess {
+  id                String     @id @default(uuid())
+  citizenId         String
+  citizen           Citizen    @relation(fields: [citizenId], references: [id])
+  serviceId         String
+  service           Service    @relation(fields: [serviceId], references: [id])
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  grantedAt         DateTime   @default(now())
+  expiresAt         DateTime?
+  revokedAt         DateTime?
+  scopes            String[]
+  consentId         String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+// Consent records for data sharing
+model Consent {
+  id                String    @id @default(uuid())
+  citizenId         String
+  citizen           Citizen   @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  purpose           String
+  dataCategories    String[]
+  granted           Boolean
+  grantedAt         DateTime?
+  expiresAt         DateTime?
+  revokedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// Administrative users of the system
+model Admin {
+  id                String       @id @default(uuid())
+  username          String       @unique
+  email             String       @unique
+  password          String
+  role              AdminRole
+  isActive          Boolean      @default(true)
+  lastLogin         DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  auditLogs         AuditLog[]
+}
+
+// User sessions
+model Session {
+  id                String    @id @default(uuid())
+  citizenId         String
+  citizen           Citizen   @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  token             String    @unique
+  userAgent         String?
+  ipAddress         String?
+  device            String?
+  location          String?
+  expiresAt         DateTime
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  isRevoked         Boolean   @default(false)
+}
+
+// Uploaded documents
+model Document {
+  id                String         @id @default(uuid())
+  citizenId         String
+  citizen           Citizen        @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  type              DocumentType
+  filename          String
+  fileSize          Int
+  mimeType          String
+  hash              String
+  uploadedAt        DateTime       @default(now())
+  verifiedAt        DateTime?
+  verifiedBy        String?
+  isVerified        Boolean        @default(false)
+  metadata          Json?
+}
+
+// System audit logs
+model AuditLog {
+  id                String      @id @default(uuid())
+  action            String
+  entityType        String
+  entityId          String
+  metadata          Json
+  citizenId         String?
+  citizen           Citizen?    @relation(fields: [citizenId], references: [id], onDelete: SetNull)
+  adminId           String?
+  admin             Admin?      @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  ipAddress         String?
+  userAgent         String?
+  timestamp         DateTime    @default(now())
+}
+
+// Enums
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  NOT_SPECIFIED
+}
+
+enum AuthType {
+  EMAIL
+  PHONE
+  FINGERPRINT
+  FACE
+  IRIS
+  VOICE
+  TOTP
+  BACKUP_CODE
+}
+
+enum OrgType {
+  GOVERNMENT
+  FINANCIAL
+  HEALTHCARE
+  EDUCATION
+  COMMERCIAL
+  NGO
+  INTERNATIONAL
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  SYSTEM_ADMIN
+  ENROLLMENT_ADMIN
+  SUPPORT_ADMIN
+  AUDITOR
+}
+
+enum DocumentType {
+  NATIONAL_ID
+  PASSPORT
+  BIRTH_CERTIFICATE
+  VOTER_CARD
+  DRIVERS_LICENSE
+  PROOF_OF_ADDRESS
+  OTHER
+}

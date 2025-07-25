@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanGov-ID Dashboard Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .dashboard-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #059669;
+        }
+        .admin-button {
+            background: #8b5cf6;
+        }
+        .admin-button:hover {
+            background: #7c3aed;
+        }
+        .org-button {
+            background: #3b82f6;
+        }
+        .org-button:hover {
+            background: #2563eb;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏛️ WanGov-ID Dashboard Test Suite</h1>
+    <p>Test all three role-based dashboards with demo accounts</p>
+
+    <div class="dashboard-section">
+        <h2>🔐 SuperAdmin Dashboard Test</h2>
+        <p>Tests the government superadmin dashboard with system-wide controls</p>
+        <button class="test-button admin-button" onclick="testLogin('superadmin@wangov.sl', 'password123', 'SuperAdmin')">
+            Test SuperAdmin Login
+        </button>
+        <button class="test-button admin-button" onclick="testDashboard('/superadmin-dashboard', 'SuperAdmin Dashboard')">
+            Test SuperAdmin Dashboard
+        </button>
+        <div id="superadmin-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>⚙️ Admin Dashboard Test</h2>
+        <p>Tests the system admin dashboard with administrative controls</p>
+        <button class="test-button admin-button" onclick="testLogin('admin@wangov.sl', 'password123', 'Admin')">
+            Test Admin Login
+        </button>
+        <button class="test-button admin-button" onclick="testDashboard('/admin', 'Admin Dashboard')">
+            Test Admin Dashboard
+        </button>
+        <div id="admin-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>🏢 Organization Dashboard Test</h2>
+        <p>Tests the organization dashboard with verification and member management</p>
+        <button class="test-button org-button" onclick="testLogin('organization@example.com', 'password123', 'Organization')">
+            Test Organization Login
+        </button>
+        <button class="test-button org-button" onclick="testDashboard('/organization', 'Organization Dashboard')">
+            Test Organization Dashboard
+        </button>
+        <div id="organization-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>👤 Citizen Dashboard Test</h2>
+        <p>Tests the citizen dashboard with personal profile and services</p>
+        <button class="test-button" onclick="testLogin('citizen@example.com', 'password123', 'Citizen')">
+            Test Citizen Login
+        </button>
+        <button class="test-button" onclick="testDashboard('/citizen', 'Citizen Dashboard')">
+            Test Citizen Dashboard
+        </button>
+        <div id="citizen-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>📊 Test Results Summary</h2>
+        <div id="summary" class="result">
+            Click the test buttons above to verify all dashboards are working correctly.
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            superadmin: { login: false, dashboard: false },
+            admin: { login: false, dashboard: false },
+            organization: { login: false, dashboard: false },
+            citizen: { login: false, dashboard: false }
+        };
+
+        async function testLogin(email, password, role) {
+            const resultDiv = document.getElementById(role.toLowerCase() + '-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `Testing ${role} login...`;
+            
+            try {
+                // Determine the correct endpoint
+                const endpoint = role === 'Citizen' ? '/api/auth/login' : '/api/admin/login';
+                
+                const response = await fetch(`http://localhost:3000${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ ${role} login successful! Token received.`;
+                    testResults[role.toLowerCase()].login = true;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ ${role} login failed: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ ${role} login error: ${error.message}`;
+            }
+            
+            updateSummary();
+        }
+
+        async function testDashboard(path, name) {
+            const role = name.split(' ')[0].toLowerCase();
+            const resultDiv = document.getElementById(role + '-result');
+            
+            try {
+                // Open the dashboard in a new tab
+                const dashboardUrl = `http://localhost:3003${path}`;
+                window.open(dashboardUrl, '_blank');
+                
+                resultDiv.innerHTML += `<br>🔗 ${name} opened in new tab: <a href="${dashboardUrl}" target="_blank">${dashboardUrl}</a>`;
+                testResults[role].dashboard = true;
+            } catch (error) {
+                resultDiv.innerHTML += `<br>❌ Failed to open ${name}: ${error.message}`;
+            }
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            let totalTests = 0;
+            let passedTests = 0;
+            
+            Object.values(testResults).forEach(result => {
+                totalTests += 2; // login + dashboard
+                if (result.login) passedTests++;
+                if (result.dashboard) passedTests++;
+            });
+            
+            const percentage = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+            
+            summary.innerHTML = `
+                <strong>Test Progress: ${passedTests}/${totalTests} tests passed (${percentage}%)</strong><br>
+                <small>
+                    SuperAdmin: Login ${testResults.superadmin.login ? '✅' : '❌'} | Dashboard ${testResults.superadmin.dashboard ? '✅' : '❌'}<br>
+                    Admin: Login ${testResults.admin.login ? '✅' : '❌'} | Dashboard ${testResults.admin.dashboard ? '✅' : '❌'}<br>
+                    Organization: Login ${testResults.organization.login ? '✅' : '❌'} | Dashboard ${testResults.organization.dashboard ? '✅' : '❌'}<br>
+                    Citizen: Login ${testResults.citizen.login ? '✅' : '❌'} | Dashboard ${testResults.citizen.dashboard ? '✅' : '❌'}
+                </small>
+            `;
+            
+            if (percentage === 100) {
+                summary.className = 'result success';
+                summary.innerHTML = '🎉 ' + summary.innerHTML + '<br><strong>All dashboards are working perfectly!</strong>';
+            } else if (percentage > 50) {
+                summary.className = 'result';
+                summary.style.background = '#fef3c7';
+                summary.style.color = '#92400e';
+            } else {
+                summary.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>
