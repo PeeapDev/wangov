@@ -76,7 +76,7 @@ const GovLoginPage: React.FC = () => {
       const clientId = 'wangov-gov-portal';
       
       // Build SSO redirect URL
-      const ssoUrl = new URL('http://sso.localhost:3004');
+      const ssoUrl = new URL('http://localhost:3010');
       ssoUrl.searchParams.set('redirect_uri', currentUrl);
       ssoUrl.searchParams.set('client_id', clientId);
       ssoUrl.searchParams.set('state', state);

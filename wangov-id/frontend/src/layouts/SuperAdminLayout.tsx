@@ -21,6 +21,7 @@ const SuperAdminLayout: React.FC = () => {
     { name: 'Business Approval', path: '/superadmin-dashboard/business-approval', icon: 'clipboard-check' },
     { name: 'API Key Approval', path: '/superadmin-dashboard/api-key-approval', icon: 'key' },
     { name: 'Provider Management', path: '/superadmin-dashboard/provider', icon: 'building-office' },
+    { name: 'Invoice Management', path: '/superadmin-dashboard/invoices', icon: 'document-text' },
     { name: 'API Management', path: '/superadmin-dashboard/api', icon: 'code' },
     { name: 'System Logs', path: '/superadmin-dashboard/logs', icon: 'list' },
     { name: 'Analytics', path: '/superadmin-dashboard/analytics', icon: 'chart-bar' },

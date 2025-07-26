@@ -11,18 +11,18 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3003,
+    port: 3004,
     host: true, // Allow external connections
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
       }
     },
   },
   preview: {
-    port: 3003,
+    port: 3004,
     host: true,
   },
 })

@@ -76,10 +76,10 @@ const LoginPage: React.FC = () => {
       
       // Generate OAuth state for security
       const state = Math.random().toString(36).substring(2, 15);
-      const clientId = 'wangov-citizen-portal';
+      const clientId = 'wangov-universal';
       
       // Build OAuth authorization URL
-      const authUrl = new URL('http://sso.localhost:3004/');
+      const authUrl = new URL('http://localhost:3010/');
       authUrl.searchParams.set('client_id', clientId);
       authUrl.searchParams.set('redirect_uri', `${window.location.origin}/auth/callback`);
       authUrl.searchParams.set('response_type', 'code');

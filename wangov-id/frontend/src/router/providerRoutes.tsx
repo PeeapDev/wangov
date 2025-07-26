@@ -6,6 +6,7 @@ import StaffManagement from '../pages/provider/StaffManagement';
 import ServicesManagement from '../pages/provider/ServicesManagement';
 import ProviderLanding from '../pages/provider/ProviderLanding';
 import ProviderLogin from '../pages/provider/ProviderLogin';
+import ProviderInvoices from '../pages/provider/ProviderInvoices';
 import Unauthorized from '../pages/provider/Unauthorized';
 import { ssoService } from '../services/ssoService';
 
@@ -98,6 +99,10 @@ const providerRoutes: RouteObject[] = [
       {
         path: 'settings',
         element: <Settings />
+      },
+      {
+        path: 'invoices/*',
+        element: <ProviderInvoices />
       }
     ]
   }

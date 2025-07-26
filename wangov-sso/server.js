@@ -6,14 +6,16 @@ const oauthConfig = require('./config/oauth');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3004;
+const PORT = process.env.PORT || 3010;
 
 // Middleware
 app.use(cors({
   origin: [
+    'http://localhost:3004',
     'http://localhost:3003',
-    'http://mbsse.localhost:3003',
-    'http://edsa.localhost:3003',
+    'http://mbsse.localhost:3004',
+    'http://edsa.localhost:3004',
+    /\.localhost:3004$/,
     /\.localhost:3003$/
   ],
   credentials: true
@@ -131,6 +133,6 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🔐 WanGov SSO Service running on http://sso.localhost:${PORT}`);
-  console.log(`📊 Health check: http://sso.localhost:${PORT}/health`);
+  console.log(` WanGov SSO Service running on http://localhost:3010`);
+  console.log(` Health check: http://localhost:3010/health`);
 });

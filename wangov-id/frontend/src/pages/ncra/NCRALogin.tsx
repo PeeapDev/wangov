@@ -34,6 +34,38 @@ const NCRALogin: React.FC = () => {
     }
   };
 
+  const handleWanGovSSO = async () => {
+    setIsLoading(true);
+    
+    try {
+      toast.loading('Redirecting to WanGov SSO...', { duration: 1000 });
+      
+      // Construct OAuth parameters
+      const currentUrl = window.location.origin + '/auth/callback';
+      const state = Math.random().toString(36).substring(2, 15);
+      const clientId = 'wangov-ncra-portal';
+      
+      // Build SSO redirect URL
+      const ssoUrl = new URL('http://localhost:3010');
+      ssoUrl.searchParams.set('redirect_uri', currentUrl);
+      ssoUrl.searchParams.set('client_id', clientId);
+      ssoUrl.searchParams.set('state', state);
+      ssoUrl.searchParams.set('response_type', 'code');
+      ssoUrl.searchParams.set('scope', 'profile email ncra_access');
+      
+      // Store state for validation when user returns
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_client_id', clientId);
+      
+      // Redirect to SSO service
+      window.location.href = ssoUrl.toString();
+    } catch (error) {
+      console.error('SSO Redirect error:', error);
+      toast.error('Unable to redirect to WanGov SSO. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
   const handleDemoLogin = async (type: 'admin' | 'staff') => {
     setIsLoading(true);
     try {
@@ -165,6 +197,37 @@ const NCRALogin: React.FC = () => {
               </button>
             </div>
           </form>
+
+          {/* WanGov SSO Section */}
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={handleWanGovSSO}
+                disabled={isLoading}
+                className="w-full flex justify-center items-center py-3 px-4 border border-green-300 rounded-md shadow-sm bg-white text-sm font-medium text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <img
+                  className="h-5 w-5 mr-3"
+                  src="/wangov-logo.png"
+                  alt="WanGov"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <ShieldCheckIcon className="h-5 w-5 mr-2 text-green-600" />
+                Sign in with WanGov
+              </button>
+            </div>
+          </div>
 
           <div className="mt-6">
             <div className="relative">

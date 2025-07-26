@@ -14,14 +14,19 @@ export const getSubdomain = (): string | null => {
   // In a browser environment
   if (typeof window !== 'undefined') {
     const { hostname } = window.location;
+    console.log('🔍 Subdomain detection - hostname:', hostname);
     
     // Handle localhost development environment
     if (hostname.includes('localhost')) {
       const parts = hostname.split('.');
+      console.log('🔍 Subdomain detection - parts:', parts);
       // If it's a subdomain of localhost (e.g., edsa.localhost)
       if (parts.length > 1 && parts[1] === 'localhost') {
-        return parts[0] === 'www' ? null : parts[0];
+        const subdomain = parts[0] === 'www' ? null : parts[0];
+        console.log('🔍 Subdomain detection - found subdomain:', subdomain);
+        return subdomain;
       }
+      console.log('🔍 Subdomain detection - no subdomain found');
       return null;
     }
     
@@ -44,7 +49,11 @@ export const getSubdomain = (): string | null => {
  */
 export const isProviderSubdomain = async (): Promise<boolean> => {
   const subdomain = getSubdomain();
-  if (!subdomain) return false;
+  console.log('🏢 Provider validation - subdomain:', subdomain);
+  if (!subdomain) {
+    console.log('🏢 Provider validation - no subdomain, returning false');
+    return false;
+  }
   
   // Here we would make an API call to verify if this is a valid provider
   // For now, we'll mock this behavior
@@ -54,8 +63,10 @@ export const isProviderSubdomain = async (): Promise<boolean> => {
     // return response.ok;
     
     // For development, we'll just consider some hardcoded values as valid
-    const validProviderSubdomains = ['edsa', 'health', 'tax', 'education', 'nassit', 'mbsse'];
-    return validProviderSubdomains.includes(subdomain);
+    const validProviderSubdomains = ['edsa', 'health', 'tax', 'education', 'nassit', 'mbsse', 'nacsa'];
+    const isValid = validProviderSubdomains.includes(subdomain);
+    console.log('🏢 Provider validation - is valid provider:', isValid);
+    return isValid;
   } catch (error) {
     console.error('Error validating provider subdomain:', error);
     return false;
@@ -125,6 +136,14 @@ const mockProviders: Record<string, ProviderDetails> = {
     logo: '/logos/mbsse.png',
     primaryColor: '#1565c0',
     secondaryColor: '#0d47a1'
+  },
+  'nacsa': {
+    id: 'nacsa-001',
+    name: 'National Commission for Social Action',
+    type: 'social_action',
+    logo: '/logos/nacsa.png',
+    primaryColor: '#059669',
+    secondaryColor: '#047857'
   }
 };
 

@@ -72,10 +72,10 @@ const ProviderLogin: React.FC = () => {
       // Construct OAuth parameters
       const currentUrl = window.location.origin + '/auth/callback';
       const state = Math.random().toString(36).substring(2, 15);
-      const clientId = 'wangov-org-portal'; // Use registered client ID
+      const clientId = 'wangov-universal'; // Use universal client for all subdomains
       
       // Build SSO redirect URL
-      const ssoUrl = new URL('http://sso.localhost:3004');
+      const ssoUrl = new URL('http://localhost:3010');
       ssoUrl.searchParams.set('redirect_uri', currentUrl);
       ssoUrl.searchParams.set('client_id', clientId);
       ssoUrl.searchParams.set('state', state);

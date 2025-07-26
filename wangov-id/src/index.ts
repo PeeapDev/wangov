@@ -15,7 +15,7 @@ dotenv.config();
 
 // Create Express server
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
@@ -77,7 +77,8 @@ app.get('/', (req, res) => {
       citizens: '/api/citizens',
       admin: '/api/admin',
       organizations: '/api/organizations',
-      sso: '/api/sso'
+      sso: '/api/sso',
+      invoices: '/api/invoices'
     },
     documentation: '/api/docs',
     environment: process.env.NODE_ENV || 'development'

@@ -5,6 +5,7 @@ import adminRoutes from './admin.routes';
 import organizationRoutes from './organization.routes';
 import ssoRoutes from './sso.routes';
 import healthRoutes from './health.routes';
+import invoiceRoutes from './invoice.routes';
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
 router.use('/organizations', organizationRoutes);
 router.use('/sso', ssoRoutes);
+router.use('/invoices', invoiceRoutes);
 
 export default router;

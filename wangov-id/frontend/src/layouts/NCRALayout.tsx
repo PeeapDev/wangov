@@ -23,6 +23,7 @@ const NCRALayout: React.FC = () => {
     { name: 'Appointments', href: '/ncra/appointments', icon: CalendarIcon },
     { name: 'Biometric Capture', href: '/ncra/biometric', icon: FingerPrintIcon },
     { name: 'ID Cards', href: '/ncra/id-cards', icon: CreditCardIcon },
+    { name: 'Invoice Management', href: '/ncra/invoices', icon: DocumentTextIcon },
     { name: 'Notifications', href: '/ncra/notifications', icon: BellIcon },
     { name: 'Administration', href: '/ncra/admin', icon: Cog6ToothIcon },
   ];

@@ -9,6 +9,7 @@ import Communication from '../pages/superadmin/Communication';
 import SecurityManagement from '../pages/superadmin/SecurityManagement';
 import SuperAdminSettings from '../pages/superadmin/Settings';
 import SuperAdminDashboard from '../pages/superadmin/SuperAdminDashboard';
+import SuperAdminInvoices from '../pages/superadmin/SuperAdminInvoices';
 import BusinessApproval from '../pages/superadmin/BusinessApproval';
 import ApiKeyApproval from '../pages/superadmin/ApiKeyApproval';
 import ProviderManagement from '../pages/superadmin/ProviderManagement';
@@ -53,6 +54,7 @@ import CitizenDashboard from '../pages/citizen/CitizenDashboard';
 import NCRADashboard from '../pages/ncra/NCRADashboard';
 import NCRALogin from '../pages/ncra/NCRALogin';
 import NCRAApplications from '../pages/ncra/NCRAApplications';
+import NCRAInvoices from '../pages/ncra/NCRAInvoices';
 
 // Organization Pages
 import OrganizationDashboard from '../pages/organization/OrganizationDashboard';
@@ -64,11 +66,14 @@ import OrgAnalytics from '../pages/organization/Analytics';
 import OrgSettings from '../pages/organization/Settings';
 import Members from '../pages/organization/Members';
 import Verification from '../pages/organization/Verification';
+import OrganizationInvoices from '../pages/organization/OrganizationInvoices';
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminInvoices from '../pages/admin/AdminInvoices';
 
 // Additional Pages
+import OAuthCallback from '../pages/auth/OAuthCallback';
 
 // SuperAdmin Staff Pages
 import SuperAdminStaffDashboard from '../pages/superadmin-staff/SuperAdminStaffDashboard';
@@ -250,6 +255,10 @@ const router = createBrowserRouter([
         path: "/register/confirmation",
         element: <PublicRoute><RegistrationConfirmation /></PublicRoute>,
       },
+      {
+        path: "/auth/callback",
+        element: <PublicRoute><OAuthCallback /></PublicRoute>,
+      },
     ],
   },
   
@@ -377,6 +386,10 @@ const router = createBrowserRouter([
         element: <SdkDocumentation />,
       },
       {
+        path: "invoices/*",
+        element: <OrganizationInvoices />,
+      },
+      {
         path: "dashboard",
         element: <Navigate to="/organization" replace />,
       },
@@ -419,6 +432,10 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <div className="p-4">System Settings Page</div>,
+      },
+      {
+        path: "invoices/*",
+        element: <AdminInvoices />,
       },
       {
         path: "dashboard",
@@ -533,6 +550,10 @@ const router = createBrowserRouter([
       {
         path: "communication",
         element: <Communication />,
+      },
+      {
+        path: "invoices/*",
+        element: <SuperAdminInvoices />,
       },
       {
         path: "dashboard",
@@ -659,6 +680,10 @@ const router = createBrowserRouter([
       {
         path: "applications",
         element: <NCRAApplications />,
+      },
+      {
+        path: "invoices/*",
+        element: <NCRAInvoices />,
       },
       // Add more NCRA routes here as we build them
       // { path: "appointments", element: <NCRAAppointments /> },

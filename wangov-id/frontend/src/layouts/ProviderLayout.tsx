@@ -6,6 +6,7 @@ import {
   HomeIcon,
   UserGroupIcon,
   DocumentChartBarIcon,
+  DocumentTextIcon,
   CogIcon,
   BellIcon,
   UserIcon,
@@ -52,6 +53,7 @@ const ProviderLayout: React.FC = () => {
     { name: 'Dashboard', path: '/dashboard', icon: HomeIcon },
     { name: 'Staff Management', path: '/dashboard/staff', icon: UserGroupIcon },
     { name: 'Services', path: '/dashboard/services', icon: DocumentChartBarIcon },
+    { name: 'Invoice Management', path: '/dashboard/invoices', icon: DocumentTextIcon },
     { name: 'Reports', path: '/dashboard/reports', icon: ChartBarIcon },
     { name: 'Settings', path: '/dashboard/settings', icon: CogIcon },
   ];

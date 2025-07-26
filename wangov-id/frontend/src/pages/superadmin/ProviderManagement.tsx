@@ -90,7 +90,7 @@ const ProviderManagement: React.FC = () => {
             createdAt: '2024-01-01T00:00:00Z',
             updatedAt: '2024-01-23T10:30:00Z',
             subdomain: 'tax',
-            subdomainUrl: 'tax.localhost:3003',
+            subdomainUrl: 'tax.localhost:3004',
             portalEnabled: true,
             primaryColor: '#388e3c',
             secondaryColor: '#1b5e20',
@@ -113,7 +113,7 @@ const ProviderManagement: React.FC = () => {
             createdAt: '2024-01-05T00:00:00Z',
             updatedAt: '2024-01-23T09:15:00Z',
             subdomain: 'education',
-            subdomainUrl: 'education.localhost:3003',
+            subdomainUrl: 'education.localhost:3004',
             portalEnabled: true,
             primaryColor: '#7b1fa2',
             secondaryColor: '#4a148c',
@@ -187,7 +187,7 @@ const ProviderManagement: React.FC = () => {
             createdAt: '2024-01-15T00:00:00Z',
             updatedAt: '2024-01-25T10:15:00Z',
             subdomain: 'mbsse',
-            subdomainUrl: 'mbsse.localhost:3003',
+            subdomainUrl: 'mbsse.localhost:3004',
             portalEnabled: true,
             primaryColor: '#1565c0',
             secondaryColor: '#0d47a1',
@@ -582,7 +582,7 @@ const ProviderModal: React.FC<ProviderModalProps> = ({
     
     // Generate subdomain URL
     if (formData.subdomain) {
-      formData.subdomainUrl = `${formData.subdomain}.localhost:3003`;
+      formData.subdomainUrl = `${formData.subdomain}.localhost:3004`;
     }
     
     setIsCreatingSubdomain(true);
@@ -788,7 +788,7 @@ const ProviderModal: React.FC<ProviderModalProps> = ({
                         pattern="[a-z0-9-]+"
                       />
                       <span className="inline-flex items-center px-3 border border-l-0 border-gray-300 rounded-r-lg bg-gray-50 text-gray-500 text-sm">
-                        .localhost:3003
+                        .localhost:3004
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
@@ -858,7 +858,7 @@ const ProviderModal: React.FC<ProviderModalProps> = ({
                   <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Portal Preview</h4>
                     <p className="text-sm text-blue-700">
-                      Portal URL: <code className="bg-blue-100 px-1 rounded">{formData.subdomain}.localhost:3003</code>
+                      Portal URL: <code className="bg-blue-100 px-1 rounded">{formData.subdomain}.localhost:3004</code>
                     </p>
                     <p className="text-sm text-blue-700 mt-1">
                       Staff will be able to sign in using their WanGov ID credentials

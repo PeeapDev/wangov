@@ -9,13 +9,29 @@ module.exports = {
 
   // Registered OAuth Clients
   clients: {
-    // WanGov Internal Services
+    // Universal WanGov SSO Client - handles all subdomains dynamically
+    'wangov-universal': {
+      name: 'WanGov Universal SSO',
+      domain: '*', // Wildcard for all domains
+      redirectUris: [
+        // Production patterns
+        'https://*.wangov.sl/auth/callback',
+        'https://*.gov.sl/auth/callback',
+        // Development patterns  
+        'http://localhost:3004/auth/callback',
+        'http://*.localhost:3004/auth/callback'
+      ],
+      scopes: ['profile', 'email', 'organization_access', 'government_access', 'nin'],
+      trusted: true,
+      universal: true // Flag for universal client
+    },
+    // Legacy - WanGov Core Portals
     'wangov-citizen-portal': {
       name: 'WanGov Citizen Portal',
-      domain: 'portal.wangov.sl',
+      domain: 'wangov.sl',
       redirectUris: [
-        'https://portal.wangov.sl/auth/callback',
-        'http://localhost:3003/auth/callback' // Development only
+        'https://wangov.sl/auth/callback',
+        'http://localhost:3004/auth/callback'
       ],
       scopes: ['profile', 'email', 'nin'],
       trusted: true
@@ -25,7 +41,7 @@ module.exports = {
       domain: 'gov.wangov.sl',
       redirectUris: [
         'https://gov.wangov.sl/auth/callback',
-        'http://localhost:3003/gov/auth/callback'
+        'http://localhost:3004/gov/auth/callback'
       ],
       scopes: ['profile', 'email', 'government_access'],
       trusted: true
@@ -35,9 +51,26 @@ module.exports = {
       domain: 'org.wangov.sl',
       redirectUris: [
         'https://org.wangov.sl/auth/callback',
-        'http://localhost:3003/org/auth/callback'
+        'http://localhost:3004/org/auth/callback',
+        'http://nacsa.localhost:3004/auth/callback',
+        'http://tax.localhost:3004/auth/callback',
+        'http://education.localhost:3004/auth/callback',
+        'http://health.localhost:3004/auth/callback',
+        'http://edsa.localhost:3004/auth/callback',
+        'http://nassit.localhost:3004/auth/callback',
+        'http://mbsse.localhost:3004/auth/callback'
       ],
       scopes: ['profile', 'email', 'organization_access'],
+      trusted: true
+    },
+    'wangov-ncra-portal': {
+      name: 'WanGov NCRA Portal',
+      domain: 'ncra.wangov.sl',
+      redirectUris: [
+        'https://ncra.wangov.sl/auth/callback',
+        'http://localhost:3004/auth/callback'
+      ],
+      scopes: ['profile', 'email', 'ncra_access', 'civil_registration'],
       trusted: true
     },
     'ncra-portal': {
@@ -45,7 +78,7 @@ module.exports = {
       domain: 'ncra.gov.sl',
       redirectUris: [
         'https://ncra.gov.sl/auth/callback',
-        'http://localhost:3003/ncra/auth/callback'
+        'http://localhost:3004/ncra/auth/callback'
       ],
       scopes: ['profile', 'email', 'nin', 'civil_registration'],
       trusted: true
@@ -167,7 +200,52 @@ module.exports = {
     const client = this.getClient(clientId);
     if (!client) return false;
     
+    // For universal client, use dynamic validation
+    if (client.universal) {
+      return this.validateUniversalRedirectUri(redirectUri);
+    }
+    
+    // For regular clients, check exact match
     return client.redirectUris.includes(redirectUri);
+  },
+
+  validateUniversalRedirectUri: function(redirectUri) {
+    try {
+      const url = new URL(redirectUri);
+      const hostname = url.hostname;
+      const port = url.port;
+      const pathname = url.pathname;
+      
+      // Must end with /auth/callback
+      if (!pathname.endsWith('/auth/callback')) {
+        return false;
+      }
+      
+      // Development patterns
+      if (hostname === 'localhost' && port === '3004') {
+        return true; // localhost:3004/auth/callback
+      }
+      
+      // Subdomain patterns for development
+      if (hostname.endsWith('.localhost') && port === '3004') {
+        return true; // *.localhost:3004/auth/callback
+      }
+      
+      // Production patterns
+      if (hostname.endsWith('.wangov.sl') || hostname.endsWith('.gov.sl')) {
+        return true; // *.wangov.sl/auth/callback or *.gov.sl/auth/callback
+      }
+      
+      // Main domains
+      if (hostname === 'wangov.sl' || hostname === 'gov.sl') {
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Invalid redirect URI format:', redirectUri);
+      return false;
+    }
   },
 
   getClientScopes: function(clientId) {
