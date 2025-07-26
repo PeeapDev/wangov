@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCRA - National Civil Registration Authority</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Header */
+        .header { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px 0; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; }
+        .logo-icon { 
+            width: 50px; height: 50px; background: #2563eb; border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; margin-right: 15px;
+        }
+        .logo-text h1 { font-size: 24px; font-weight: bold; color: #111827; }
+        .logo-text p { font-size: 14px; color: #6b7280; }
+        .btn { 
+            padding: 12px 24px; background: #2563eb; color: white; 
+            text-decoration: none; border-radius: 8px; font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #1d4ed8; }
+        
+        /* Main Content */
+        .main { padding: 80px 0; text-align: center; }
+        .hero-title { 
+            font-size: 56px; font-weight: 800; color: #111827; 
+            margin-bottom: 20px; line-height: 1.1;
+        }
+        .hero-subtitle { 
+            font-size: 20px; color: #6b7280; max-width: 700px; 
+            margin: 0 auto 50px auto; line-height: 1.6;
+        }
+        
+        /* Features */
+        .features { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 30px; margin: 80px 0; text-align: left;
+        }
+        .feature { 
+            background: white; border-radius: 15px; padding: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .feature-icon { 
+            font-size: 40px; margin-bottom: 20px; display: block;
+        }
+        .feature h3 { 
+            font-size: 20px; font-weight: 600; color: #111827; 
+            margin-bottom: 10px;
+        }
+        .feature p { color: #6b7280; line-height: 1.6; }
+        
+        /* CTA */
+        .cta { 
+            background: white; border-radius: 15px; padding: 50px; 
+            margin: 60px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .cta h2 { font-size: 32px; font-weight: bold; color: #111827; margin-bottom: 15px; }
+        .cta p { color: #6b7280; margin-bottom: 30px; font-size: 18px; }
+        .cta-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .btn-secondary { 
+            background: #f3f4f6; color: #374151; 
+        }
+        .btn-secondary:hover { background: #e5e7eb; }
+        
+        /* Status */
+        .status { 
+            background: #f0fdf4; border: 2px solid #bbf7d0; 
+            border-radius: 10px; padding: 20px; margin: 30px 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .status-text { color: #166534; font-weight: 500; }
+        
+        /* Footer */
+        .footer { 
+            background: white; border-top: 1px solid #e5e7eb; 
+            margin-top: 80px; padding: 50px 0;
+        }
+        .footer-content { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 40px; margin-bottom: 40px;
+        }
+        .footer-section h4 { 
+            font-size: 16px; font-weight: 600; color: #111827; 
+            margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .footer-section p, .footer-section a { 
+            color: #6b7280; margin-bottom: 8px; text-decoration: none; 
+            display: block;
+        }
+        .footer-section a:hover { color: #2563eb; }
+        .footer-bottom { 
+            border-top: 1px solid #e5e7eb; padding-top: 30px; 
+            text-align: center; color: #9ca3af;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 36px; }
+            .hero-subtitle { font-size: 18px; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .features { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🛡️</div>
+                    <div class="logo-text">
+                        <h1>NCRA</h1>
+                        <p>Civil Registration Authority</p>
+                    </div>
+                </div>
+                <a href="/auth/login" class="btn">Staff Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="main">
+            <h1 class="hero-title">
+                National Civil<br>
+                <span style="color: #2563eb;">Registration Authority</span>
+            </h1>
+            <p class="hero-subtitle">
+                Official government portal for civil registration services, identity management, 
+                and administrative operations in Sierra Leone.
+            </p>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">📋</span>
+                <h3>Civil Registration</h3>
+                <p>Register births, deaths, marriages, and other vital events. Manage citizen and resident permit applications with comprehensive tracking.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">💳</span>
+                <h3>Identity Cards</h3>
+                <p>Issue national identity cards, manage biometric data, and oversee the complete ID lifecycle from application to delivery.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">📅</span>
+                <h3>Appointments</h3>
+                <p>Schedule and manage appointments for biometric capture, document verification, and ID collection with automated notifications.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">👆</span>
+                <h3>Biometric Services</h3>
+                <p>Secure biometric data collection including fingerprints, photographs, and digital signatures with quality verification.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">⚙️</span>
+                <h3>Administration</h3>
+                <p>Manage registration centers, staff accounts, system settings, and operational workflows with comprehensive reporting.</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">🔔</span>
+                <h3>Notifications</h3>
+                <p>Send automated notifications via SMS and email for appointment confirmations, status updates, and ID readiness alerts.</p>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta">
+            <h2>Staff Access Portal</h2>
+            <p>
+                Access the NCRA administrative dashboard to manage civil registration operations, 
+                process applications, and oversee the complete identity management workflow.
+            </p>
+            <div class="cta-buttons">
+                <a href="/auth/login" class="btn">🔐 Staff Login</a>
+                <a href="https://wangov.gov.sl" class="btn btn-secondary">🌐 WanGov Portal</a>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="status">
+            <div class="status-text">
+                ✅ <strong>System Status:</strong> All services operational • Last updated: <span id="timestamp"></span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Contact Information</h4>
+                    <p>National Civil Registration Authority</p>
+                    <p>15 Siaka Stevens Street, Freetown</p>
+                    <p>Phone: +232 76 123 456</p>
+                    <p>Email: info@ncra.gov.sl</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <a href="#">Birth Registration</a>
+                    <a href="#">Death Registration</a>
+                    <a href="#">Marriage Registration</a>
+                    <a href="#">National ID Cards</a>
+                    <a href="#">Resident Permits</a>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Government Links</h4>
+                    <a href="https://wangov.gov.sl">WanGov Portal</a>
+                    <a href="#">Ministry of Internal Affairs</a>
+                    <a href="#">Government of Sierra Leone</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2025 Government of Sierra Leone. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+        
+        // Update timestamp every minute
+        setInterval(() => {
+            document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+        }, 60000);
+    </script>
+</body>
+</html>

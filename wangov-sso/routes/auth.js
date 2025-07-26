@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const { getCitizenByEmail, getCitizenByNIN, createAuthSession } = require('../services/database');
+const { getCitizenByEmail, getCitizenByNIN, createAuthSession, createCitizen } = require('../services/database');
 
 const router = express.Router();
 
@@ -53,18 +53,40 @@ router.post('/login', async (req, res) => {
     if (req.session.oauth && req.session.oauth.redirect_url) {
       const authCode = `wangov_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Store auth code for later validation
-      req.session.authCode = authCode;
-      
-      const redirectUrl = new URL(req.session.oauth.redirect_url);
-      redirectUrl.searchParams.set('code', authCode);
-      if (req.session.oauth.state) {
-        redirectUrl.searchParams.set('state', req.session.oauth.state);
-      }
+      // Store the authorization code temporarily (in production, use Redis or database)
+      req.session.authCode = {
+        code: authCode,
+        user: {
+          id: citizen.id,
+          email: citizen.email,
+          name: `${citizen.first_name} ${citizen.last_name}`,
+          nin: citizen.nin,
+          phone: citizen.phone_number,
+          isVerified: citizen.is_ncra_verified
+        },
+        client_id: req.session.oauth?.client_id,
+        scope: req.session.oauth?.scope
+      };
 
-      return res.json({
+      res.json({
         success: true,
-        redirect: redirectUrl.toString(),
+        message: 'Login successful',
+        authCode: authCode,
+        redirectUrl: req.session.oauth?.redirect_uri,
+        state: req.session.oauth?.state,
+        user: {
+          id: citizen.id,
+          email: citizen.email,
+          name: `${citizen.first_name} ${citizen.last_name}`,
+          nin: citizen.nin,
+          phone: citizen.phone_number,
+          isVerified: citizen.is_ncra_verified
+        }
+      });
+    } else {
+      // Regular login success
+      res.json({
+        success: true,
         user: {
           id: citizen.id,
           email: citizen.email,
@@ -73,17 +95,6 @@ router.post('/login', async (req, res) => {
         }
       });
     }
-
-    // Regular login success
-    res.json({
-      success: true,
-      user: {
-        id: citizen.id,
-        email: citizen.email,
-        name: `${citizen.first_name} ${citizen.last_name}`,
-        nin: citizen.nin
-      }
-    });
 
   } catch (error) {
     console.error('Login error:', error);
@@ -140,30 +151,143 @@ router.post('/logout', (req, res) => {
   });
 });
 
-// OAuth token exchange (for provider portals)
+// Signup endpoint
+router.post('/signup', async (req, res) => {
+  try {
+    const { firstName, lastName, email, nin, password, confirmPassword, birthDate, placeOfBirth } = req.body;
+
+    // Validation
+    if (!firstName || !lastName || !email || !nin || !password || !confirmPassword || !birthDate || !placeOfBirth) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Validate NIN format (Sierra Leone format: SL followed by 9 digits)
+    const ninRegex = /^SL\d{9}$/;
+    if (!ninRegex.test(nin)) {
+      return res.status(400).json({ error: 'Invalid NIN format. Must be SL followed by 9 digits' });
+    }
+
+    // Create new citizen
+    const newCitizen = await createCitizen({
+      firstName,
+      lastName,
+      email,
+      nin,
+      password,
+      birthDate,
+      placeOfBirth
+    });
+
+    // Create session for the new user
+    const sessionId = uuidv4();
+    await createAuthSession(sessionId, newCitizen.id, req.session.oauth?.client_id);
+
+    // Store user in session
+    req.session.user = {
+      id: newCitizen.id,
+      email: newCitizen.email,
+      firstName: newCitizen.first_name,
+      lastName: newCitizen.last_name,
+      nin: newCitizen.nin,
+      ncraVerified: newCitizen.ncra_verified,
+      sessionId
+    };
+
+    // Generate authorization code for OAuth flow
+    const authCode = `wangov_${Date.now()}_${Math.random().toString(36).substr(2, 15)}`;
+    req.session.authCode = authCode;
+
+    res.json({
+      success: true,
+      message: 'Account created successfully! Please note: Your account requires NCRA verification for full access.',
+      user: {
+        id: newCitizen.id,
+        email: newCitizen.email,
+        firstName: newCitizen.first_name,
+        lastName: newCitizen.last_name,
+        ncraVerified: newCitizen.ncra_verified
+      },
+      authCode,
+      redirectUrl: req.session.oauth?.redirect_url
+    });
+
+  } catch (error) {
+    console.error('Signup error:', error);
+    
+    if (error.message.includes('already exists') || error.message.includes('already registered')) {
+      return res.status(409).json({ error: error.message });
+    }
+    
+    res.status(500).json({ error: 'Failed to create account. Please try again.' });
+  }
+});
+
+// OAuth token exchange endpoint
 router.post('/token', async (req, res) => {
   try {
-    const { code, client_id, client_secret, grant_type } = req.body;
+    const { code, client_id, grant_type } = req.body;
 
     if (grant_type !== 'authorization_code') {
-      return res.status(400).json({ error: 'unsupported_grant_type' });
+      return res.status(400).json({ 
+        error: 'unsupported_grant_type',
+        error_description: 'Only authorization_code grant type is supported'
+      });
     }
 
-    // Validate the authorization code (in production, this would be more secure)
-    if (!code || !code.startsWith('wangov_')) {
-      return res.status(400).json({ error: 'invalid_grant' });
+    if (!client_id) {
+      return res.status(400).json({ 
+        error: 'invalid_client',
+        error_description: 'Client ID is required'
+      });
     }
 
-    // Generate access token
+    // Find the stored authorization code in session
+    // In production, this would be stored in Redis or database
+    const storedAuth = req.session.authCode;
+    if (!storedAuth || storedAuth.code !== code) {
+      return res.status(400).json({ 
+        error: 'invalid_grant',
+        error_description: 'Invalid or expired authorization code'
+      });
+    }
+
+    // Validate client_id matches
+    if (storedAuth.client_id !== client_id) {
+      return res.status(400).json({ 
+        error: 'invalid_client',
+        error_description: 'Client ID mismatch'
+      });
+    }
+
+    // Generate tokens
     const accessToken = `wangov_access_${Date.now()}_${Math.random().toString(36).substr(2, 15)}`;
     const refreshToken = `wangov_refresh_${Date.now()}_${Math.random().toString(36).substr(2, 15)}`;
 
+    // Clear the used authorization code
+    delete req.session.authCode;
+
+    // Return tokens and user data
     res.json({
       access_token: accessToken,
       token_type: 'Bearer',
       expires_in: 3600,
       refresh_token: refreshToken,
-      scope: 'openid profile email'
+      scope: storedAuth.scope || 'profile email',
+      user: storedAuth.user
     });
 
   } catch (error) {

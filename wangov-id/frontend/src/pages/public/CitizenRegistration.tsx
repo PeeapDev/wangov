@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, User, MapPin, FileText, Calendar, CheckCircle, Clock } from 'lucide-react';
+import { 
+  ArrowLeftIcon, 
+  ArrowRightIcon, 
+  UserIcon, 
+  MapPinIcon, 
+  DocumentTextIcon, 
+  CalendarIcon, 
+  CheckCircleIcon, 
+  ClockIcon 
+} from '@heroicons/react/24/outline';
 
 interface PersonalInfo {
   firstName: string;
@@ -80,10 +89,10 @@ const CitizenRegistration: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
-    { number: 1, title: 'Personal Information', icon: User },
-    { number: 2, title: 'Address Details', icon: MapPin },
-    { number: 3, title: 'Document Upload', icon: FileText },
-    { number: 4, title: 'Appointment Booking', icon: Calendar }
+    { number: 1, title: 'Personal Information', icon: UserIcon },
+    { number: 2, title: 'Address Details', icon: MapPinIcon },
+    { number: 3, title: 'Document Upload', icon: DocumentTextIcon },
+    { number: 4, title: 'Appointment Booking', icon: CalendarIcon }
   ];
 
   const districts = [
@@ -536,7 +545,7 @@ const CitizenRegistration: React.FC = () => {
                         : 'border-gray-300 text-gray-400 bg-white'
                   }`}>
                     {isCompleted ? (
-                      <CheckCircle className="h-6 w-6" />
+                      <CheckCircleIcon className="h-6 w-6" />
                     ) : (
                       <Icon className="h-5 w-5" />
                     )}
@@ -575,7 +584,7 @@ const CitizenRegistration: React.FC = () => {
             onClick={() => navigate('/register')}
             className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeftIcon className="h-5 w-5" />
             <span>Back to Options</span>
           </button>
 
@@ -585,7 +594,7 @@ const CitizenRegistration: React.FC = () => {
                 onClick={handlePrevious}
                 className="flex items-center space-x-2 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeftIcon className="h-5 w-5" />
                 <span>Previous</span>
               </button>
             )}
@@ -596,7 +605,7 @@ const CitizenRegistration: React.FC = () => {
                 className="flex items-center space-x-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 <span>Next</span>
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRightIcon className="h-5 w-5" />
               </button>
             ) : (
               <button
@@ -606,13 +615,13 @@ const CitizenRegistration: React.FC = () => {
               >
                 {isSubmitting ? (
                   <>
-                    <Clock className="h-5 w-5 animate-spin" />
+                    <ClockIcon className="h-5 w-5 animate-spin" />
                     <span>Submitting...</span>
                   </>
                 ) : (
                   <>
                     <span>Submit Application</span>
-                    <CheckCircle className="h-5 w-5" />
+                    <CheckCircleIcon className="h-5 w-5" />
                   </>
                 )}
               </button>

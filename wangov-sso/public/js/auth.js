@@ -120,15 +120,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const formData = new FormData(this);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            // Client-side validation
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showMessage('Password must be at least 8 characters long', 'error');
+                return;
+            }
+            
             const data = {
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
                 email: formData.get('email'),
                 nin: formData.get('nin'),
-                password: formData.get('password')
+                password: password,
+                confirmPassword: confirmPassword,
+                birthDate: formData.get('birthDate'),
+                placeOfBirth: formData.get('placeOfBirth')
             };
 
-            const response = await fetch('/auth/register', {
+            const response = await fetch('/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -140,7 +157,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (result.success) {
                 showMessage(result.message, 'success');
-                if (!result.requiresVerification) {
+                
+                // If OAuth flow, redirect back to the application
+                if (result.authCode && result.redirectUrl) {
+                    setTimeout(() => {
+                        const redirectUrl = new URL(result.redirectUrl);
+                        redirectUrl.searchParams.set('code', result.authCode);
+                        redirectUrl.searchParams.set('state', new URLSearchParams(window.location.search).get('state'));
+                        window.location.href = redirectUrl.toString();
+                    }, 2000);
+                } else {
                     setTimeout(() => showLogin(), 2000);
                 }
             } else {

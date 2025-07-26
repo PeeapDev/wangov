@@ -68,6 +68,37 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleWanGovSSO = async () => {
+    setIsLoading(true);
+    
+    try {
+      toast.loading('Redirecting to WanGov ID...', { duration: 1000 });
+      
+      // Generate OAuth state for security
+      const state = Math.random().toString(36).substring(2, 15);
+      const clientId = 'wangov-citizen-portal';
+      
+      // Build OAuth authorization URL
+      const authUrl = new URL('http://sso.localhost:3004/');
+      authUrl.searchParams.set('client_id', clientId);
+      authUrl.searchParams.set('redirect_uri', `${window.location.origin}/auth/callback`);
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('scope', 'profile email nin');
+      authUrl.searchParams.set('state', state);
+      
+      // Store state for validation when user returns
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_client_id', clientId);
+      
+      // Redirect to WanGov SSO
+      window.location.href = authUrl.toString();
+    } catch (error) {
+      console.error('SSO Redirect error:', error);
+      toast.error('Unable to redirect to WanGov ID. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -240,29 +271,29 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div>
-                <a
-                  href="#"
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                >
-                  <span className="sr-only">Sign in with Government ID</span>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 4h3a3 3 0 006 0h3a2 2 0 012 2v9a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm2.5 7a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm2.45 4a2.5 2.5 0 10-4.9 0h4.9zM12 9a1 1 0 100 2h3a1 1 0 100-2h-3zm-1 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clipRule="evenodd" />
-                  </svg>
-                </a>
+            {/* WanGov SSO Section */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
               </div>
 
-              <div>
-                <a
-                  href="#"
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={handleWanGovSSO}
+                  disabled={isLoading}
+                  className="w-full inline-flex justify-center py-2 px-4 border border-blue-300 rounded-md shadow-sm bg-blue-50 text-sm font-medium text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span className="sr-only">Sign in with Mobile ID</span>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
                   </svg>
-                </a>
+                  Login with WanGov ID
+                </button>
               </div>
             </div>
           </div>

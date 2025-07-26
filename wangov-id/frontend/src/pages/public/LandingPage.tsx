@@ -1,7 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const LandingPage: React.FC = () => {
+  const handleWanGovSignup = async () => {
+    try {
+      toast.loading('Redirecting to WanGov Registration...', { duration: 1000 });
+      
+      // Generate OAuth state for security
+      const state = Math.random().toString(36).substring(2, 15);
+      const clientId = 'wangov-citizen-portal';
+      
+      // Build OAuth authorization URL for signup
+      const authUrl = new URL('http://sso.localhost:3004/');
+      authUrl.searchParams.set('client_id', clientId);
+      authUrl.searchParams.set('redirect_uri', `${window.location.origin}/auth/callback`);
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('scope', 'profile email nin');
+      authUrl.searchParams.set('state', state);
+      authUrl.searchParams.set('signup', 'true'); // Indicate this is for signup
+      
+      // Store state for validation when user returns
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_client_id', clientId);
+      
+      // Redirect to WanGov SSO for signup
+      window.location.href = authUrl.toString();
+    } catch (error) {
+      console.error('SSO Signup Redirect error:', error);
+      toast.error('Unable to redirect to WanGov Registration. Please try again.');
+    }
+  };
+
   return (
     <div className="bg-white">
       {/* Hero section */}
@@ -35,7 +65,7 @@ const LandingPage: React.FC = () => {
           </div>
           
           <div className="mt-6 flex justify-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl w-full">
               <Link
                 to="/gov/auth/login"
                 className="inline-block bg-gray-100 border border-gray-300 rounded-md py-2 px-4 text-sm font-medium text-gray-800 hover:bg-gray-200 text-center flex items-center justify-center"
@@ -53,6 +83,15 @@ const LandingPage: React.FC = () => {
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
                 Organization Portal
+              </Link>
+              <Link
+                to="/ncra/auth/login"
+                className="inline-block bg-blue-100 border border-blue-300 rounded-md py-2 px-4 text-sm font-medium text-blue-800 hover:bg-blue-200 text-center flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                NCRA Portal
               </Link>
             </div>
           </div>
@@ -206,12 +245,23 @@ const LandingPage: React.FC = () => {
                 <p className="mt-4 text-lg leading-6 text-green-200">
                   Join the digital transformation of Sierra Leone. Get access to government services, healthcare, education, and more with a single secure identity.
                 </p>
-                <Link
-                  to="/register"
-                  className="mt-8 bg-white border border-transparent rounded-md shadow px-5 py-3 inline-flex items-center text-base font-medium text-green-700 hover:bg-green-50"
-                >
-                  Register Now
-                </Link>
+                <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={handleWanGovSignup}
+                    className="bg-white border border-transparent rounded-md shadow px-5 py-3 inline-flex items-center text-base font-medium text-green-700 hover:bg-green-50 transition-colors"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                    </svg>
+                    Register with WanGov ID
+                  </button>
+                  <Link
+                    to="/register"
+                    className="bg-transparent border border-white rounded-md shadow px-5 py-3 inline-flex items-center text-base font-medium text-white hover:bg-white hover:text-green-700 transition-colors"
+                  >
+                    Traditional Registration
+                  </Link>
+                </div>
               </div>
             </div>
             <div className="relative -mt-6 aspect-w-5 aspect-h-3 md:aspect-w-2 md:aspect-h-1">

@@ -61,6 +61,38 @@ const OrgLoginPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  const handleWanGovSSO = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      toast.loading('Redirecting to WanGov SSO...', { duration: 1000 });
+      
+      // Construct OAuth parameters
+      const currentUrl = window.location.origin + '/auth/callback';
+      const state = Math.random().toString(36).substring(2, 15);
+      const clientId = 'wangov-org-portal';
+      
+      // Build SSO redirect URL
+      const ssoUrl = new URL('http://sso.localhost:3004');
+      ssoUrl.searchParams.set('redirect_uri', currentUrl);
+      ssoUrl.searchParams.set('client_id', clientId);
+      ssoUrl.searchParams.set('state', state);
+      ssoUrl.searchParams.set('response_type', 'code');
+      ssoUrl.searchParams.set('scope', 'profile email organization_access');
+      
+      // Store state for validation when user returns
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_client_id', clientId);
+      
+      // Redirect to SSO service
+      window.location.href = ssoUrl.toString();
+    } catch (error) {
+      console.error('SSO Redirect error:', error);
+      toast.error('Unable to redirect to WanGov SSO. Please try again.');
+      setIsSubmitting(false);
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -168,6 +200,32 @@ const OrgLoginPage: React.FC = () => {
                 </div>
               </div>
             </form>
+            
+            {/* WanGov SSO Section */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={handleWanGovSSO}
+                  disabled={isSubmitting}
+                  className="w-full inline-flex justify-center py-2 px-4 border border-blue-300 rounded-md shadow-sm bg-blue-50 text-sm font-medium text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                  Login with WanGov ID
+                </button>
+              </div>
+            </div>
             
             <div className="mt-6 text-center">
               <Link to="/login" className="text-sm font-medium text-green-600">

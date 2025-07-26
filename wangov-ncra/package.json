@@ -1,0 +1,41 @@
+{
+  "name": "wangov-ncra",
+  "version": "1.0.0",
+  "description": "WanGov NCRA Civil Registration Authority Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step required for Express app'",
+    "test": "echo 'No tests specified'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "bcryptjs": "^2.4.3",
+    "uuid": "^9.0.0",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "nodemailer": "^6.9.8",
+    "twilio": "^4.19.3",
+    "pg": "^8.11.3",
+    "multer": "^1.4.5-lts.1",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "ncra",
+    "civil-registration",
+    "government",
+    "sierra-leone",
+    "biometric",
+    "id-management"
+  ],
+  "author": "WanGov Development Team",
+  "license": "MIT"
+}

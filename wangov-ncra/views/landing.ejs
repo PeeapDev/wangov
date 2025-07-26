@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCRA - National Civil Registration Authority</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px 0; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; }
+        .logo-icon { width: 40px; height: 40px; background: #2563eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .logo-text { margin-left: 12px; }
+        .logo-title { font-size: 20px; font-weight: bold; color: #111827; margin: 0; }
+        .logo-subtitle { font-size: 14px; color: #6b7280; margin: 0; }
+        .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .hero { text-align: center; padding: 60px 0; }
+        .hero-title { font-size: 48px; font-weight: 800; color: #111827; margin: 0 0 16px 0; }
+        .hero-subtitle { font-size: 18px; color: #6b7280; max-width: 600px; margin: 0 auto 40px auto; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 60px 0; }
+        .feature-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .feature-icon { width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-weight: bold; }
+        .feature-title { font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 8px 0; }
+        .feature-desc { color: #6b7280; line-height: 1.6; }
+        .cta { background: white; border-radius: 12px; padding: 40px; text-align: center; margin: 40px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .cta-title { font-size: 24px; font-weight: bold; color: #111827; margin: 0 0 16px 0; }
+        .cta-desc { color: #6b7280; margin: 0 0 24px 0; }
+        .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .status { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 20px 0; }
+        .status-content { display: flex; align-items: center; color: #166534; }
+        .footer { background: white; border-top: 1px solid #e5e7eb; margin-top: 60px; padding: 40px 0; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px; }
+        .footer-section h3 { font-size: 14px; font-weight: 600; color: #111827; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 16px 0; }
+        .footer-section p, .footer-section a { font-size: 14px; color: #6b7280; margin: 0 0 8px 0; text-decoration: none; }
+        .footer-section a:hover { color: #2563eb; }
+        .footer-bottom { border-top: 1px solid #e5e7eb; margin-top: 32px; padding-top: 32px; text-align: center; }
+        .footer-bottom p { font-size: 14px; color: #9ca3af; margin: 0; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🛡️</div>
+                    <div class="logo-text">
+                        <h1 class="logo-title">NCRA</h1>
+                        <p class="logo-subtitle">Civil Registration Authority</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="/auth/login" class="btn btn-primary">
+                        Staff Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="container">
+        <div class="hero">
+            <h1 class="hero-title">
+                National Civil<br>
+                <span style="color: #2563eb;">Registration Authority</span>
+            </h1>
+            <p class="hero-subtitle">
+                Official government portal for civil registration services, identity management, and administrative operations in Sierra Leone.
+            </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="features">
+            <!-- Civil Registration -->
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #dbeafe; color: #2563eb;">📄</div>
+                <h3 class="feature-title">Civil Registration</h3>
+                <p class="feature-desc">
+                    Register births, deaths, marriages, and other vital events. Manage citizen and resident permit applications.
+                </p>
+            </div>
+
+                <!-- Identity Management -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="credit-card" class="h-6 w-6 text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Identity Cards</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">
+                            Issue national identity cards, manage biometric data, and oversee the complete ID lifecycle.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Appointment System -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="calendar" class="h-6 w-6 text-purple-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Appointments</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">
+                            Schedule and manage appointments for biometric capture, document verification, and ID collection.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Biometric Services -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="fingerprint" class="h-6 w-6 text-yellow-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Biometric Capture</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">
+                            Secure biometric data collection including fingerprints, photographs, and digital signatures.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Administrative Tools -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="settings" class="h-6 w-6 text-red-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Administration</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">
+                            Manage registration centers, staff accounts, system settings, and operational workflows.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="bell" class="h-6 w-6 text-indigo-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900">Notifications</h3>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">
+                            Send automated notifications via SMS and email for appointment confirmations and ID readiness.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="mt-16 bg-white rounded-lg shadow-lg p-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Staff Access Portal</h2>
+            <p class="text-gray-600 mb-6">
+                Access the NCRA administrative dashboard to manage civil registration operations, 
+                process applications, and oversee the complete identity management workflow.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/auth/login" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors inline-flex items-center justify-center">
+                    <i data-lucide="log-in" class="w-4 h-4 mr-2"></i>
+                    Staff Login
+                </a>
+                <a href="https://wangov.gov.sl" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 transition-colors inline-flex items-center justify-center">
+                    <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                    WanGov Portal
+                </a>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="mt-8 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i data-lucide="check-circle" class="h-5 w-5 text-green-600"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-800">
+                        <strong>System Status:</strong> All services operational
+                        <span class="ml-2 text-green-600">• Last updated: <span id="lastUpdated"></span></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Contact</h3>
+                    <div class="mt-4 space-y-2">
+                        <p class="text-sm text-gray-600">National Civil Registration Authority</p>
+                        <p class="text-sm text-gray-600">15 Siaka Stevens Street, Freetown</p>
+                        <p class="text-sm text-gray-600">Phone: +232 76 123 456</p>
+                        <p class="text-sm text-gray-600">Email: info@ncra.gov.sl</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Services</h3>
+                    <div class="mt-4 space-y-2">
+                        <p class="text-sm text-gray-600">Birth Registration</p>
+                        <p class="text-sm text-gray-600">Death Registration</p>
+                        <p class="text-sm text-gray-600">Marriage Registration</p>
+                        <p class="text-sm text-gray-600">National ID Cards</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Government</h3>
+                    <div class="mt-4 space-y-2">
+                        <a href="https://wangov.gov.sl" class="text-sm text-gray-600 hover:text-blue-600">WanGov Portal</a>
+                        <a href="#" class="text-sm text-gray-600 hover:text-blue-600">Ministry of Internal Affairs</a>
+                        <a href="#" class="text-sm text-gray-600 hover:text-blue-600">Government of Sierra Leone</a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-200 pt-8">
+                <p class="text-sm text-gray-500 text-center">
+                    © 2025 Government of Sierra Leone. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Update timestamp
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+    </script>
+</body>
+</html>

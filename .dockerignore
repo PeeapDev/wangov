@@ -88,7 +88,6 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
@@ -111,3 +110,11 @@ __tests__/
 docs/
 README.md
 *.md
+
+node_modules/
+.next/
+.env
+dist/
+build/
+*.log
+.DS_Store

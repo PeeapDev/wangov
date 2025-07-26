@@ -11,6 +11,8 @@ export interface User {
   firstName?: string;
   lastName?: string;
   organizationId?: string;
+  organizationName?: string;
+  isNCRA?: boolean; // Flag to identify NCRA users
   isEmailVerified: boolean;
 }
 
@@ -56,6 +58,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
+      // Check for mock NCRA user data in localStorage first
+      const storedUser = localStorage.getItem('user');
+      if (storedUser && token.startsWith('mock-ncra-token')) {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        setAuthenticated(true);
+        setError(null);
+        return;
+      }
+      
+      // Otherwise, try to get user from API
       const userData = await authService.getCurrentUser();
       setUser(userData);
       setAuthenticated(true);
@@ -64,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Clear invalid tokens
       localStorage.removeItem('token');
       localStorage.removeItem('adminToken');
+      localStorage.removeItem('user');
       setUser(null);
       setAuthenticated(false);
       // Silent fail on initial load as the user might not be logged in
@@ -117,6 +131,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
       await authService.logout();
+      // Clear all stored user data
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
       setUser(null);
       setAuthenticated(false);
       window.location.href = '/';

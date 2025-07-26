@@ -32,6 +32,7 @@ import AdminLayout from '../layouts/AdminLayout';
 import SuperAdminLayout from '../layouts/SuperAdminLayout';
 import SuperAdminStaffLayout from '../layouts/SuperAdminStaffLayout';
 import OrganizationStaffLayout from '../layouts/OrganizationStaffLayout';
+import NCRALayout from '../layouts/NCRALayout';
 
 // Public Pages
 import LandingPage from '../pages/public/LandingPage';
@@ -47,6 +48,11 @@ import RegistrationConfirmation from '../pages/public/RegistrationConfirmation';
 
 // Citizen Pages
 import CitizenDashboard from '../pages/citizen/CitizenDashboard';
+
+// NCRA Pages
+import NCRADashboard from '../pages/ncra/NCRADashboard';
+import NCRALogin from '../pages/ncra/NCRALogin';
+import NCRAApplications from '../pages/ncra/NCRAApplications';
 
 // Organization Pages
 import OrganizationDashboard from '../pages/organization/OrganizationDashboard';
@@ -176,8 +182,16 @@ const PublicRoute: React.FC<{
       case 'citizen':
         return <Navigate to="/citizen" replace />;
       case 'organization':
+        // Check if this is an NCRA user
+        if (user?.isNCRA) {
+          return <Navigate to="/ncra" replace />;
+        }
         return <Navigate to="/organization" replace />;
       case 'organization-staff':
+        // Check if this is an NCRA staff user
+        if (user?.isNCRA) {
+          return <Navigate to="/ncra" replace />;
+        }
         return <Navigate to="/organization-staff" replace />;
       case 'admin':
         return <Navigate to="/admin" replace />;
@@ -625,6 +639,31 @@ const router = createBrowserRouter([
   {
     path: "/superadmin/dashboard",
     element: <Navigate to="/superadmin-dashboard" replace />,
+  },
+
+  // NCRA Routes (Public Login)
+  {
+    path: "/ncra/auth/login",
+    element: <PublicRoute routeType="organization"><NCRALogin /></PublicRoute>,
+  },
+
+  // NCRA Routes (Protected)
+  {
+    path: "/ncra",
+    element: <ProtectedRoute requiredRole="organization"><NCRALayout /></ProtectedRoute>,
+    children: [
+      {
+        index: true,
+        element: <NCRADashboard />,
+      },
+      {
+        path: "applications",
+        element: <NCRAApplications />,
+      },
+      // Add more NCRA routes here as we build them
+      // { path: "appointments", element: <NCRAAppointments /> },
+      // { path: "biometric", element: <NCRABiometric /> },
+    ],
   },
   
   // Fallback route for 404s

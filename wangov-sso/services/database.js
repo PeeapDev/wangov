@@ -116,47 +116,156 @@ async function createAuthSession(sessionId, citizenId, clientId) {
 }
 
 /**
- * Mock data for development when database is not available
+ * Mock NCRA verified citizens database
  */
-function getMockCitizen(email) {
-  // Only return mock data for @wangov.sl emails
-  if (!email.endsWith('@wangov.sl')) {
-    return null;
-  }
-
-  const bcrypt = require('bcryptjs');
-  
-  return {
-    id: 'mock_citizen_1',
-    email: email,
-    first_name: 'John',
-    last_name: 'Doe',
-    nin: 'SL123456789',
-    password_hash: bcrypt.hashSync('password123', 10), // Default password for demo
-    is_verified: true,
-    created_at: new Date(),
-    updated_at: new Date()
-  };
-}
-
-function getMockCitizenByNIN(nin) {
-  if (nin !== 'SL123456789') {
-    return null;
-  }
-
-  const bcrypt = require('bcryptjs');
-  
-  return {
-    id: 'mock_citizen_1',
+const mockNCRAVerifiedCitizens = {
+  'john.doe@wangov.sl': {
+    id: 'ncra_verified_001',
     email: 'john.doe@wangov.sl',
     first_name: 'John',
     last_name: 'Doe',
-    nin: nin,
-    password_hash: bcrypt.hashSync('password123', 10),
+    nin: 'SL123456789',
+    password_hash: null, // Will be set on first login
     is_verified: true,
-    created_at: new Date(),
+    ncra_verified: true,
+    ncra_verification_date: '2024-01-15',
+    birth_date: '1990-05-15',
+    place_of_birth: 'Freetown, Sierra Leone',
+    created_at: new Date('2024-01-15'),
     updated_at: new Date()
-  };
+  },
+  'mary.kamara@wangov.sl': {
+    id: 'ncra_verified_002',
+    email: 'mary.kamara@wangov.sl',
+    first_name: 'Mary',
+    last_name: 'Kamara',
+    nin: 'SL987654321',
+    password_hash: null,
+    is_verified: true,
+    ncra_verified: true,
+    ncra_verification_date: '2024-02-20',
+    birth_date: '1985-08-22',
+    place_of_birth: 'Bo, Sierra Leone',
+    created_at: new Date('2024-02-20'),
+    updated_at: new Date()
+  },
+  'admin@wangov.sl': {
+    id: 'ncra_admin_001',
+    email: 'admin@wangov.sl',
+    first_name: 'System',
+    last_name: 'Administrator',
+    nin: 'SL000000001',
+    password_hash: null,
+    is_verified: true,
+    ncra_verified: true,
+    ncra_verification_date: '2024-01-01',
+    birth_date: '1980-01-01',
+    place_of_birth: 'Freetown, Sierra Leone',
+    created_at: new Date('2024-01-01'),
+    updated_at: new Date()
+  }
+};
+
+/**
+ * Mock data for development when database is not available
+ */
+function getMockCitizen(email) {
+  const bcrypt = require('bcryptjs');
+  
+  // Check if user exists in NCRA verified database
+  const citizen = mockNCRAVerifiedCitizens[email];
+  if (citizen) {
+    // Set default password if not set
+    if (!citizen.password_hash) {
+      citizen.password_hash = bcrypt.hashSync('password123', 10);
+    }
+    return citizen;
+  }
+  
+  // For demo purposes, allow any @wangov.sl email
+  if (email.endsWith('@wangov.sl')) {
+    return {
+      id: `mock_${email.split('@')[0]}`,
+      email: email,
+      first_name: 'Demo',
+      last_name: 'User',
+      nin: `SL${Math.random().toString().substr(2, 9)}`,
+      password_hash: bcrypt.hashSync('password123', 10),
+      is_verified: false, // Not NCRA verified
+      ncra_verified: false,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+  }
+  
+  return null;
+}
+
+function getMockCitizenByNIN(nin) {
+  const bcrypt = require('bcryptjs');
+  
+  // Search through NCRA verified citizens by NIN
+  for (const email in mockNCRAVerifiedCitizens) {
+    const citizen = mockNCRAVerifiedCitizens[email];
+    if (citizen.nin === nin) {
+      // Set default password if not set
+      if (!citizen.password_hash) {
+        citizen.password_hash = bcrypt.hashSync('password123', 10);
+      }
+      return citizen;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Create new citizen account (signup)
+ */
+async function createCitizen(citizenData) {
+  try {
+    // In production, this would insert into database
+    // For development, we'll simulate the process
+    
+    const { email, password, firstName, lastName, nin, birthDate, placeOfBirth } = citizenData;
+    const bcrypt = require('bcryptjs');
+    
+    // Check if citizen already exists
+    if (mockNCRAVerifiedCitizens[email]) {
+      throw new Error('Citizen with this email already exists');
+    }
+    
+    // Check if NIN is already registered
+    for (const existingEmail in mockNCRAVerifiedCitizens) {
+      if (mockNCRAVerifiedCitizens[existingEmail].nin === nin) {
+        throw new Error('This NIN is already registered');
+      }
+    }
+    
+    // Create new citizen record
+    const newCitizen = {
+      id: `citizen_${Date.now()}`,
+      email,
+      first_name: firstName,
+      last_name: lastName,
+      nin,
+      password_hash: bcrypt.hashSync(password, 10),
+      is_verified: false, // Requires NCRA verification
+      ncra_verified: false,
+      birth_date: birthDate,
+      place_of_birth: placeOfBirth,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    
+    // Add to mock database
+    mockNCRAVerifiedCitizens[email] = newCitizen;
+    
+    return newCitizen;
+  } catch (error) {
+    console.error('Error creating citizen:', error);
+    throw error;
+  }
 }
 
 module.exports = {
@@ -164,5 +273,6 @@ module.exports = {
   getCitizenByEmail,
   getCitizenByNIN,
   getCitizenById,
-  createAuthSession
+  createAuthSession,
+  createCitizen
 };

@@ -209,14 +209,68 @@
                         >
                     </div>
 
-                    <div>
-                        <label for="regPassword" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input
-                            id="regPassword"
-                            name="password"
-                            type="password"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                        >
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="regPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input
+                                id="regPassword"
+                                name="password"
+                                type="password"
+                                required
+                                minlength="8"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                            >
+                        </div>
+                        <div>
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                            <input
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                type="password"
+                                required
+                                minlength="8"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="birthDate" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                            <input
+                                id="birthDate"
+                                name="birthDate"
+                                type="date"
+                                required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                            >
+                        </div>
+                        <div>
+                            <label for="placeOfBirth" class="block text-sm font-medium text-gray-700">Place of Birth</label>
+                            <input
+                                id="placeOfBirth"
+                                name="placeOfBirth"
+                                type="text"
+                                required
+                                placeholder="e.g., Freetown, Sierra Leone"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- NCRA Verification Notice -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                            <div>
+                                <h4 class="text-sm font-medium text-blue-900">NCRA Verification Required</h4>
+                                <p class="mt-1 text-xs text-blue-700">
+                                    Your account will be created but requires verification by the National Civil Registration Authority (NCRA) for full access to government services.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -237,11 +291,20 @@
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                         </svg>
                         <div>
-                            <h4 class="text-sm font-medium text-gray-900">Demo Login</h4>
-                            <div class="mt-1 text-xs text-gray-600 space-y-1">
-                                <p><strong>Email:</strong> any email ending with @wangov.sl</p>
-                                <p><strong>NIN:</strong> SL123456789</p>
-                                <p><strong>Password:</strong> password123</p>
+                            <h4 class="text-sm font-medium text-gray-900">Demo Accounts</h4>
+                            <div class="mt-1 text-xs text-gray-600 space-y-2">
+                                <div class="bg-green-50 p-2 rounded border border-green-200">
+                                    <p class="font-medium text-green-800">✅ NCRA Verified Users:</p>
+                                    <p><strong>Email:</strong> john.doe@wangov.sl | mary.kamara@wangov.sl | admin@wangov.sl</p>
+                                    <p><strong>Password:</strong> password123</p>
+                                    <p class="text-green-700">These accounts have full access to all services</p>
+                                </div>
+                                <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
+                                    <p class="font-medium text-yellow-800">⚠️ Unverified Users:</p>
+                                    <p><strong>Email:</strong> any other @wangov.sl email</p>
+                                    <p><strong>Password:</strong> password123</p>
+                                    <p class="text-yellow-700">Limited access - requires NCRA verification</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -260,6 +323,19 @@
         </div>
     </div>
 
+    <script>
+        // Auto-show signup form if in signup mode
+        <% if (signupMode) { %>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit for the auth.js to load and define showRegister
+            setTimeout(() => {
+                if (typeof showRegister === 'function') {
+                    showRegister();
+                }
+            }, 100);
+        });
+        <% } %>
+    </script>
     <script src="/js/auth.js"></script>
 </body>
 </html>

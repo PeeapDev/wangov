@@ -69,17 +69,18 @@ const ProviderLogin: React.FC = () => {
     try {
       toast.loading('Redirecting to WanGov ID...', { duration: 1000 });
       
-      // Construct OAuth-like parameters
-      const currentUrl = window.location.origin + window.location.pathname;
+      // Construct OAuth parameters
+      const currentUrl = window.location.origin + '/auth/callback';
       const state = Math.random().toString(36).substring(2, 15);
-      const clientId = `provider_${provider?.subdomain || 'unknown'}`;
+      const clientId = 'wangov-org-portal'; // Use registered client ID
       
       // Build SSO redirect URL
       const ssoUrl = new URL('http://sso.localhost:3004');
-      ssoUrl.searchParams.set('redirect_url', currentUrl);
+      ssoUrl.searchParams.set('redirect_uri', currentUrl);
       ssoUrl.searchParams.set('client_id', clientId);
       ssoUrl.searchParams.set('state', state);
       ssoUrl.searchParams.set('response_type', 'code');
+      ssoUrl.searchParams.set('scope', 'profile email organization_access');
       
       // Store state for validation when user returns
       sessionStorage.setItem('oauth_state', state);

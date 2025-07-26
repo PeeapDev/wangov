@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
 const path = require('path');
+const oauthConfig = require('./config/oauth');
 require('dotenv').config();
 
 const app = express();
@@ -41,25 +42,69 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/auth', require('./routes/auth'));
 app.use('/api', require('./routes/api'));
 
-// Main SSO page
+// Main SSO page - secured access only via OAuth flow
 app.get('/', (req, res) => {
-  const { redirect_url, client_id, state, response_type } = req.query;
+  const { redirect_uri, client_id, state, response_type, scope, signup } = req.query;
   
-  // Store OAuth parameters in session
-  if (redirect_url) {
-    req.session.oauth = {
-      redirect_url,
-      client_id,
-      state,
-      response_type
-    };
+  // Security: Only allow access with proper OAuth parameters
+  if (!redirect_uri || !client_id || !state || !response_type) {
+    return res.status(400).render('error', {
+      title: 'Invalid Request',
+      error: 'Missing required OAuth parameters',
+      message: 'This service can only be accessed through authorized applications.',
+      details: 'Required parameters: redirect_uri, client_id, state, response_type'
+    });
   }
 
+  // Validate client_id and redirect_uri
+  const client = oauthConfig.getClient(client_id);
+  if (!client) {
+    return res.status(400).render('error', {
+      title: 'Invalid Client',
+      error: 'Unauthorized client application',
+      message: `Client '${client_id}' is not registered with WanGov SSO.`,
+      details: 'Please contact the application developer to register with WanGov SSO.'
+    });
+  }
+
+  // Validate redirect URI
+  if (!oauthConfig.validateRedirectUri(client_id, redirect_uri)) {
+    return res.status(400).render('error', {
+      title: 'Invalid Redirect URI',
+      error: 'Unauthorized redirect URI',
+      message: `The redirect URI '${redirect_uri}' is not registered for client '${client.name}'.`,
+      details: 'Please contact the application developer to register the correct redirect URI.'
+    });
+  }
+
+  // Validate requested scopes
+  const requestedScopes = scope ? scope.split(' ') : ['profile', 'email'];
+  if (!oauthConfig.validateScopes(client_id, requestedScopes)) {
+    return res.status(400).render('error', {
+      title: 'Invalid Scope',
+      error: 'Unauthorized scope requested',
+      message: `Some requested scopes are not authorized for client '${client.name}'.`,
+      details: `Available scopes: ${client.scopes.join(', ')}`
+    });
+  }
+
+  // Store OAuth parameters in session
+  req.session.oauth = {
+    redirect_uri,
+    client_id,
+    state,
+    response_type,
+    scope: requestedScopes.join(' '),
+    client_name: client.name,
+    client_domain: client.domain
+  };
+
   res.render('login', {
-    title: 'WanGov ID - Secure Authentication',
+    title: signup === 'true' ? 'WanGov ID - Create Account' : 'WanGov ID - Secure Authentication',
     oauth: req.session.oauth || null,
     error: req.query.error || null,
-    message: req.query.message || null
+    message: req.query.message || null,
+    signupMode: signup === 'true'
   });
 });
 
