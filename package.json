@@ -23,5 +23,9 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@opensearch-project/opensearch": "^3.5.1",
+    "jsonwebtoken": "^9.0.2"
   }
 }

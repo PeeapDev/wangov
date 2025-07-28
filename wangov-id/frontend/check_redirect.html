@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Check Redirect Issue</title>
+</head>
+<body>
+  <h1>NCRA Redirect Debugger</h1>
+  <button onclick="displayUserData()">Show Current User Data</button>
+  <button onclick="fixUserData()">Fix NCRA User Data</button>
+  <button onclick="clearData()">Clear User Data</button>
+  <div id="output" style="white-space: pre; margin-top: 20px; padding: 10px; border: 1px solid #ccc; max-height: 400px; overflow: auto;"></div>
+  
+  <script>
+    function displayUserData() {
+      const output = document.getElementById('output');
+      output.innerHTML = '';
+      
+      // Get data from localStorage
+      const user = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      const adminToken = localStorage.getItem('adminToken');
+      
+      output.innerHTML += `User data: ${user ? JSON.stringify(JSON.parse(user), null, 2) : 'Not found'}\n\n`;
+      output.innerHTML += `Token: ${token || 'Not found'}\n\n`;
+      output.innerHTML += `Admin Token: ${adminToken || 'Not found'}\n\n`;
+    }
+    
+    function fixUserData() {
+      const mockNCRAUser = {
+        id: 'ncra-admin-123',
+        email: 'ncra-admin@wangov.sl',
+        role: 'ncra',
+        firstName: 'NCRA',
+        lastName: 'Admin',
+        isEmailVerified: true,
+        isNCRA: true
+      };
+      
+      localStorage.setItem('adminToken', 'mock-ncra-token-fixed');
+      localStorage.setItem('user', JSON.stringify(mockNCRAUser));
+      
+      displayUserData();
+      
+      document.getElementById('output').innerHTML += 'NCRA user data fixed. Please refresh the app and try again.';
+    }
+    
+    function clearData() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
+      
+      displayUserData();
+      document.getElementById('output').innerHTML += 'All user data cleared.';
+    }
+  </script>
+</body>
+</html>

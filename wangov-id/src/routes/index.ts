@@ -6,6 +6,7 @@ import organizationRoutes from './organization.routes';
 import ssoRoutes from './sso.routes';
 import healthRoutes from './health.routes';
 import invoiceRoutes from './invoice.routes';
+import searchRoutes from './searchRoutes';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use('/admin', adminRoutes);
 router.use('/organizations', organizationRoutes);
 router.use('/sso', ssoRoutes);
 router.use('/invoices', invoiceRoutes);
+router.use('/search', searchRoutes);
 
 export default router;

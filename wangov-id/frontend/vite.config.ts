@@ -11,8 +11,14 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3004,
-    host: true, // Allow external connections
+    port: 3003,
+    host: '0.0.0.0', // More explicit than 'true' for binding to all interfaces
+    strictPort: true, // Don't try other ports if 3003 is taken
+    hmr: {
+      host: 'localhost', // Required for HMR to work with subdomains
+      port: 3003,
+      clientPort: 3003 // Make sure client and server use same port
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
@@ -22,7 +28,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port: 3004,
+    port: 3003,
     host: true,
   },
 })

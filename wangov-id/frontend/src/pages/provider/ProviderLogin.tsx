@@ -75,7 +75,7 @@ const ProviderLogin: React.FC = () => {
       const clientId = 'wangov-universal'; // Use universal client for all subdomains
       
       // Build SSO redirect URL
-      const ssoUrl = new URL('http://localhost:3010');
+      const ssoUrl = new URL('http://localhost:3010/auth/authorize');
       ssoUrl.searchParams.set('redirect_uri', currentUrl);
       ssoUrl.searchParams.set('client_id', clientId);
       ssoUrl.searchParams.set('state', state);

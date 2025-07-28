@@ -2,6 +2,62 @@ import axios from 'axios';
 import { User, UserRole } from '../contexts/AuthContext';
 import { apiClient } from './apiClient';
 
+// Mock users for demo logins when database is unavailable
+const mockUsers: Record<string, User> = {
+  'superadmin@wangov.sl': {
+    id: 'super-admin-1',
+    email: 'superadmin@wangov.sl',
+    role: 'superadmin',
+    firstName: 'Super',
+    lastName: 'Admin',
+    isEmailVerified: true
+  },
+  'admin@wangov.sl': {
+    id: 'admin-1',
+    email: 'admin@wangov.sl',
+    role: 'admin',
+    firstName: 'System',
+    lastName: 'Admin',
+    isEmailVerified: true
+  },
+  'ncra@wangov.sl': {
+    id: 'ncra-1',
+    email: 'ncra@wangov.sl',
+    role: 'ncra',
+    firstName: 'NCRA',
+    lastName: 'Admin',
+    isEmailVerified: true
+  },
+  'organization@example.com': {
+    id: 'org-1',
+    email: 'organization@example.com',
+    role: 'organization',
+    firstName: 'Org',
+    lastName: 'Manager',
+    organizationId: 'org-1',
+    organizationName: 'Demo Organization',
+    isEmailVerified: true
+  },
+  'orgstaff@example.com': {
+    id: 'org-staff-1',
+    email: 'orgstaff@example.com',
+    role: 'organization-staff',
+    firstName: 'Staff',
+    lastName: 'Member',
+    organizationId: 'org-1',
+    organizationName: 'Demo Organization',
+    isEmailVerified: true
+  },
+  'citizen@example.com': {
+    id: 'citizen-1',
+    email: 'citizen@example.com',
+    role: 'citizen',
+    firstName: 'Demo',
+    lastName: 'Citizen',
+    isEmailVerified: true
+  }
+};
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -23,6 +79,15 @@ export const authService = {
    */
   async login(email: string, password: string): Promise<User> {
     try {
+      // For demo accounts, check if this is a known mock user first
+      if (mockUsers[email] && password === 'password123') {
+        // Create a mock token
+        const mockToken = `mock-token-${mockUsers[email].role}-${Date.now()}`;
+        localStorage.setItem('token', mockToken);
+        localStorage.setItem('user', JSON.stringify(mockUsers[email]));
+        return mockUsers[email];
+      }
+
       const response = await apiClient.post('/auth/login', { email, password });
       const { token, citizen } = response.data.data;
       
@@ -39,6 +104,15 @@ export const authService = {
         isEmailVerified: true
       };
     } catch (error) {
+      // Fall back to mock users for demo accounts if API call fails
+      if (mockUsers[email] && password === 'password123') {
+        // Create a mock token
+        const mockToken = `mock-token-${mockUsers[email].role}-${Date.now()}`;
+        localStorage.setItem('token', mockToken);
+        localStorage.setItem('user', JSON.stringify(mockUsers[email]));
+        return mockUsers[email];
+      }
+      
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(error.response.data.message || 'Login failed');
       }
@@ -51,6 +125,15 @@ export const authService = {
    */
   async adminLogin(email: string, password: string): Promise<User> {
     try {
+      // For demo accounts, check if this is a known mock user first
+      if (mockUsers[email] && password === 'password123') {
+        // Create a mock token
+        const mockToken = `mock-token-${mockUsers[email].role}-${Date.now()}`;
+        localStorage.setItem('adminToken', mockToken);
+        localStorage.setItem('user', JSON.stringify(mockUsers[email]));
+        return mockUsers[email];
+      }
+
       const response = await apiClient.post('/admin/login', { email, password });
       const { token, admin } = response.data.data;
       
@@ -67,6 +150,15 @@ export const authService = {
         isEmailVerified: true
       };
     } catch (error) {
+      // Fall back to mock users for demo accounts if API call fails
+      if (mockUsers[email] && password === 'password123') {
+        // Create a mock token
+        const mockToken = `mock-token-${mockUsers[email].role}-${Date.now()}`;
+        localStorage.setItem('adminToken', mockToken);
+        localStorage.setItem('user', JSON.stringify(mockUsers[email]));
+        return mockUsers[email];
+      }
+      
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(error.response.data.message || 'Admin login failed');
       }
@@ -83,6 +175,8 @@ export const authService = {
         return 'superadmin';
       case 'SYSTEM_ADMIN':
         return 'admin';
+      case 'NCRA_ADMIN':
+        return 'ncra';
       case 'ENROLLMENT_ADMIN':
         return 'organization';
       case 'SUPPORT_ADMIN':
@@ -128,6 +222,15 @@ export const authService = {
    */
   async getCurrentUser(): Promise<User> {
     try {
+      // Check for mock user first
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+      
+      // If we have a stored user and a mock token, return it
+      if (storedUser && token && token.startsWith('mock-token-')) {
+        return JSON.parse(storedUser);
+      }
+      
       const response = await apiClient.get('/auth/me');
       return response.data.user;
     } catch (error) {

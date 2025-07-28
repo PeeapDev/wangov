@@ -11,11 +11,9 @@ const PORT = process.env.PORT || 3010;
 // Middleware
 app.use(cors({
   origin: [
-    'http://localhost:3004',
     'http://localhost:3003',
-    'http://mbsse.localhost:3004',
-    'http://edsa.localhost:3004',
-    /\.localhost:3004$/,
+    'http://mbsse.localhost:3003',
+    'http://edsa.localhost:3003',
     /\.localhost:3003$/
   ],
   credentials: true
@@ -32,7 +30,9 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: false, // Set to true in production with HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'none', // Allow cross-site cookies for OAuth flow
+    domain: 'localhost' // Allow sharing across subdomains
   }
 }));
 

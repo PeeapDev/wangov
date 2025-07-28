@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WanGov SSO Test Links</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 20px;
+        }
+        .test-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .link {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .link:hover {
+            background-color: #0d47a1;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .url {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-wrap: break-word;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WanGov SSO Test Links</h1>
+    
+    <div class="test-card">
+        <h2>EDSA Service Test</h2>
+        <div class="description">
+            This link simulates a login request from the EDSA service.
+            The login banner should show "EDSA Sierra Leone" as the requesting service.
+        </div>
+        <div class="url">
+            http://localhost:3010/auth/authorize?client_id=wangov-org-portal&redirect_uri=http%3A%2F%2Fedsa.localhost%3A3003%2Fauth%2Fcallback&response_type=code&state=test123&scope=profile%20email
+        </div>
+        <a href="http://localhost:3010/auth/authorize?client_id=wangov-org-portal&redirect_uri=http%3A%2F%2Fedsa.localhost%3A3003%2Fauth%2Fcallback&response_type=code&state=test123&scope=profile%20email" class="link">Test EDSA Login</a>
+    </div>
+    
+    <div class="test-card">
+        <h2>NCRA Service Test</h2>
+        <div class="description">
+            This link simulates a login request from the National Civil Registration Authority.
+            The login banner should show "National Civil Registration Authority" as the requesting service.
+        </div>
+        <div class="url">
+            http://localhost:3010/auth/authorize?client_id=ncra-portal&redirect_uri=http%3A%2F%2Fncra.localhost%3A3003%2Fauth%2Fcallback&response_type=code&state=test456&scope=profile%20email
+        </div>
+        <a href="http://localhost:3010/auth/authorize?client_id=ncra-portal&redirect_uri=http%3A%2F%2Fncra.localhost%3A3003%2Fauth%2Fcallback&response_type=code&state=test456&scope=profile%20email" class="link">Test NCRA Login</a>
+    </div>
+    
+    <div class="test-card">
+        <h2>Generic Login (No Service Name)</h2>
+        <div class="description">
+            This link uses the generic wangov-universal client ID without a specific service name.
+            The login banner should fall back to "WanGov Universal SSO" as the requesting service.
+        </div>
+        <div class="url">
+            http://localhost:3010/auth/authorize?client_id=wangov-universal&redirect_uri=http%3A%2F%2Flocalhost%3A3003%2Fauth%2Fcallback&response_type=code&state=test789&scope=profile%20email
+        </div>
+        <a href="http://localhost:3010/auth/authorize?client_id=wangov-universal&redirect_uri=http%3A%2F%2Flocalhost%3A3003%2Fauth%2Fcallback&response_type=code&state=test789&scope=profile%20email" class="link">Test Generic Login</a>
+    </div>
+    
+    <p>
+        <strong>Note:</strong> These links directly access the SSO authorization endpoint with pre-configured parameters for testing.
+        After successful login, you will see the 404 error as expected since we don't have actual callback handlers set up.
+        This is just to verify that the service names are displayed correctly on the login page.
+    </p>
+</body>
+</html>

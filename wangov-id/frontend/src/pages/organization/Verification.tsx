@@ -1,7 +1,8 @@
 import React from 'react';
 import { ShieldCheckIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
+import PermissionGuard from '../../components/organization/PermissionGuard';
 
-const Verification: React.FC = () => {
+const VerificationContent: React.FC = () => {
   return (
     <div className="p-6">
       {/* Header */}
@@ -34,6 +35,14 @@ const Verification: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Verification: React.FC = () => {
+  return (
+    <PermissionGuard permission="identityVerification">
+      <VerificationContent />
+    </PermissionGuard>
   );
 };
 

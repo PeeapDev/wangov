@@ -8,6 +8,7 @@ import ProviderLanding from '../pages/provider/ProviderLanding';
 import ProviderLogin from '../pages/provider/ProviderLogin';
 import ProviderInvoices from '../pages/provider/ProviderInvoices';
 import Unauthorized from '../pages/provider/Unauthorized';
+import OAuthCallback from '../pages/auth/OAuthCallback';
 import { ssoService } from '../services/ssoService';
 
 // Protected route component for provider portal
@@ -74,6 +75,10 @@ const providerRoutes: RouteObject[] = [
   {
     path: '/unauthorized',
     element: <Unauthorized />,
+  },
+  {
+    path: '/auth/callback',
+    element: <PublicRoute><OAuthCallback /></PublicRoute>,
   },
   // Protected routes with provider layout
   {

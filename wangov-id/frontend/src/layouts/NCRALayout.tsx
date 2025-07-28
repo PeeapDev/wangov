@@ -9,9 +9,12 @@ import {
   BellIcon,
   Cog6ToothIcon,
   ArrowLeftOnRectangleIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  MagnifyingGlassIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
+import SearchBar from '../components/search/SearchBar';
 
 const NCRALayout: React.FC = () => {
   const location = useLocation();
@@ -19,7 +22,18 @@ const NCRALayout: React.FC = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/ncra', icon: HomeIcon },
-    { name: 'Applications', href: '/ncra/applications', icon: DocumentTextIcon },
+    { name: 'Citizens', href: '/ncra/citizens', icon: UserGroupIcon },
+    { 
+      name: 'Applications', 
+      href: '/ncra/applications', 
+      icon: DocumentTextIcon,
+      children: [
+        { name: 'All Applications', href: '/ncra/applications' },
+        { name: 'Processing', href: '/ncra/applications/processing' },
+        { name: 'Pending', href: '/ncra/applications/pending' },
+      ] 
+    },
+    { name: 'Rejected', href: '/ncra/rejected', icon: ShieldCheckIcon },
     { name: 'Appointments', href: '/ncra/appointments', icon: CalendarIcon },
     { name: 'Biometric Capture', href: '/ncra/biometric', icon: FingerPrintIcon },
     { name: 'ID Cards', href: '/ncra/id-cards', icon: CreditCardIcon },
@@ -56,18 +70,39 @@ const NCRALayout: React.FC = () => {
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive(item.href)
-                      ? 'bg-blue-800 text-white'
-                      : 'text-blue-200 hover:bg-blue-800 hover:text-white'
-                  }`}
-                >
-                  <Icon className="h-5 w-5 mr-3" />
-                  {item.name}
-                </Link>
+                <div key={item.name} className="mb-2">
+                  <Link
+                    to={item.href}
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                      isActive(item.href) && !item.children
+                        ? 'bg-blue-800 text-white'
+                        : 'text-blue-200 hover:bg-blue-800 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 mr-3" />
+                    {item.name}
+                  </Link>
+                  
+                  {/* Render child items if they exist */}
+                  {item.children && (
+                    <div className="ml-8 mt-1 space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.name}
+                          to={child.href}
+                          className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                            location.pathname === child.href
+                              ? 'bg-blue-800 text-white'
+                              : 'text-blue-200 hover:bg-blue-700 hover:text-white'
+                          }`}
+                        >
+                          <span className="h-1 w-1 rounded-full bg-blue-400 mr-3"></span>
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
@@ -118,6 +153,14 @@ const NCRALayout: React.FC = () => {
                 </nav>
                 
                 <div className="flex items-center space-x-4">
+                  {/* Search Bar */}
+                  <div className="w-96">
+                    <SearchBar 
+                      role="ncra" 
+                      placeholder="Search citizens, applications, or IDs..." 
+                      className="bg-gray-50 border border-gray-300"
+                    />
+                  </div>
                   <div className="text-sm text-gray-500">
                     Sierra Leone Government
                   </div>

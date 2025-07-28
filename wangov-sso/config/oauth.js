@@ -3,7 +3,7 @@ module.exports = {
   // SSO Service Configuration
   sso: {
     domain: process.env.SSO_DOMAIN || 'sso.localhost',
-    port: process.env.PORT || 3004,
+    port: process.env.PORT || 3003,
     protocol: process.env.NODE_ENV === 'production' ? 'https' : 'http'
   },
 
@@ -18,8 +18,8 @@ module.exports = {
         'https://*.wangov.sl/auth/callback',
         'https://*.gov.sl/auth/callback',
         // Development patterns  
-        'http://localhost:3004/auth/callback',
-        'http://*.localhost:3004/auth/callback'
+        'http://localhost:3003/auth/callback',
+        'http://*.localhost:3003/auth/callback'
       ],
       scopes: ['profile', 'email', 'organization_access', 'government_access', 'nin'],
       trusted: true,
@@ -41,7 +41,7 @@ module.exports = {
       domain: 'gov.wangov.sl',
       redirectUris: [
         'https://gov.wangov.sl/auth/callback',
-        'http://localhost:3004/gov/auth/callback'
+        'http://localhost:3003/gov/auth/callback'
       ],
       scopes: ['profile', 'email', 'government_access'],
       trusted: true
@@ -51,14 +51,14 @@ module.exports = {
       domain: 'org.wangov.sl',
       redirectUris: [
         'https://org.wangov.sl/auth/callback',
-        'http://localhost:3004/org/auth/callback',
-        'http://nacsa.localhost:3004/auth/callback',
-        'http://tax.localhost:3004/auth/callback',
-        'http://education.localhost:3004/auth/callback',
-        'http://health.localhost:3004/auth/callback',
-        'http://edsa.localhost:3004/auth/callback',
-        'http://nassit.localhost:3004/auth/callback',
-        'http://mbsse.localhost:3004/auth/callback'
+        'http://localhost:3003/org/auth/callback',
+        'http://nacsa.localhost:3003/auth/callback',
+        'http://tax.localhost:3003/auth/callback',
+        'http://education.localhost:3003/auth/callback',
+        'http://health.localhost:3003/auth/callback',
+        'http://edsa.localhost:3003/auth/callback',
+        'http://nassit.localhost:3003/auth/callback',
+        'http://mbsse.localhost:3003/auth/callback'
       ],
       scopes: ['profile', 'email', 'organization_access'],
       trusted: true
@@ -216,19 +216,19 @@ module.exports = {
       const port = url.port;
       const pathname = url.pathname;
       
-      // Must end with /auth/callback
-      if (!pathname.endsWith('/auth/callback')) {
+      // Must contain callback in the path for security
+      if (!pathname.includes('callback')) {
         return false;
       }
       
-      // Development patterns
-      if (hostname === 'localhost' && port === '3004') {
-        return true; // localhost:3004/auth/callback
+      // Development patterns - allow any port on localhost for flexibility
+      if (hostname === 'localhost') {
+        return true; // localhost:*/auth/callback
       }
       
-      // Subdomain patterns for development
-      if (hostname.endsWith('.localhost') && port === '3004') {
-        return true; // *.localhost:3004/auth/callback
+      // Subdomain patterns for development - allow any port
+      if (hostname.endsWith('.localhost')) {
+        return true; // *.localhost:*/auth/callback
       }
       
       // Production patterns

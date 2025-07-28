@@ -46,38 +46,38 @@ export const organizationPages: PageConfig[] = [
     ]
   },
   {
-    id: 'sso-integration',
-    title: 'SSO Integration',
-    path: '/organization/sso',
+    id: 'api-integration',
+    title: 'API Integration',
+    path: '/organization/api',
     icon: 'KeyIcon',
-    description: 'Single Sign-On integration and API keys',
-    component: 'SSOIntegration',
+    description: 'API keys and data exchange integration',
+    component: 'ApiIntegration',
     children: [
       {
         id: 'api-keys',
         title: 'API Keys',
-        path: '/organization/sso/api-keys',
+        path: '/organization/api/keys',
         icon: 'IdentificationIcon',
-        description: 'Manage your API keys',
+        description: 'Manage your API keys for data exchange',
         component: 'ApiKeys'
-      },
-      {
-        id: 'oauth-apps',
-        title: 'OAuth Applications',
-        path: '/organization/sso/oauth',
-        icon: 'ShieldCheckIcon',
-        description: 'Manage OAuth applications',
-        component: 'OAuthApps'
       },
       {
         id: 'webhooks',
         title: 'Webhooks',
-        path: '/organization/sso/webhooks',
+        path: '/organization/api/webhooks',
         icon: 'BoltIcon',
         description: 'Configure webhook endpoints',
         component: 'Webhooks'
       }
     ]
+  },
+  {
+    id: 'sso-management',
+    title: 'SSO Management',
+    path: '/organization/sso',
+    icon: 'ShieldCheckIcon',
+    description: 'Single Sign-On configuration per business',
+    component: 'BusinessSSOManagement'
   },
   {
     id: 'sandbox',

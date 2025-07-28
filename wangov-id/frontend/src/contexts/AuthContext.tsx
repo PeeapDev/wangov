@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 
 // Define user types based on role
-export type UserRole = 'citizen' | 'organization' | 'organization-staff' | 'admin' | 'superadmin' | 'superadmin-staff';
+export type UserRole = 'citizen' | 'organization' | 'organization-staff' | 'admin' | 'superadmin' | 'superadmin-staff' | 'ncra';
 
 export interface User {
   id: string;
@@ -101,7 +101,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       
-      // Try organization login if allowed roles suggest organization user
+      // Try NCRA login specifically if that role is allowed
+      if (!userData && allowedRoles && allowedRoles.includes('ncra')) {
+        try {
+          // Use same login mechanism but mark as NCRA specifically
+          const ncraUserData = await authService.adminLogin(email, password);
+          if (ncraUserData) {
+            // Set role explicitly to 'ncra' instead of organization
+            ncraUserData.role = 'ncra';
+            userData = ncraUserData;
+          }
+        } catch (ncraError) {
+          // If NCRA login fails, continue to other methods
+        }
+      }
+      
+      // Try organization login if allowed roles suggest organization user and NCRA didn't work
       if (!userData && allowedRoles && (allowedRoles.includes('organization') || allowedRoles.includes('organization-staff'))) {
         try {
           userData = await authService.adminLogin(email, password);

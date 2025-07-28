@@ -1,4 +1,5 @@
 import React, { useState, Fragment } from 'react';
+import SearchBar from '../search/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { useAuth, User } from '../../contexts/AuthContext';
@@ -49,6 +50,14 @@ const CitizenHeader: React.FC<CitizenHeaderProps> = ({ openSidebar, user }) => {
             </div>
           </div>
           <div className="flex items-center">
+            {/* Search Bar */}
+            <div className="hidden md:block w-64 lg:w-96 mr-4">
+              <SearchBar 
+                placeholder="Search your applications and services..." 
+                variant="citizen" 
+                userRole="citizen"
+              />
+            </div>
             <div className="hidden md:ml-4 md:flex-shrink-0 md:flex md:items-center">
               {/* Notifications */}
               <div className="relative">

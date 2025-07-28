@@ -1,0 +1,426 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Copy, Eye, EyeOff, Plus, Settings, Trash2, Key, Globe, Shield } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface OAuthClient {
+  id: string;
+  name: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUris: string[];
+  scopes: string[];
+  trusted: boolean;
+  createdAt: string;
+  lastUsed?: string;
+  status: 'active' | 'inactive';
+}
+
+const SSOManagement: React.FC = () => {
+  const [clients, setClients] = useState<OAuthClient[]>([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showSecrets, setShowSecrets] = useState<{ [key: string]: boolean }>({});
+  const [loading, setLoading] = useState(false);
+  
+  // Form state for creating new client
+  const [newClient, setNewClient] = useState({
+    name: '',
+    description: '',
+    redirectUris: '',
+    scopes: ['profile', 'email'],
+    trusted: false
+  });
+
+  // Mock data - replace with API calls
+  useEffect(() => {
+    // Simulate API call
+    setClients([
+      {
+        id: '1',
+        name: 'WordPress Site',
+        clientId: 'wangov_wp_abc123def456',
+        clientSecret: 'sk_live_abcdef123456789',
+        redirectUris: ['http://localhost:8080/wangov-auth/callback'],
+        scopes: ['profile', 'email', 'organization_access'],
+        trusted: true,
+        createdAt: '2024-01-15',
+        lastUsed: '2024-01-20',
+        status: 'active'
+      },
+      {
+        id: '2',
+        name: 'Mobile App',
+        clientId: 'wangov_mobile_xyz789abc123',
+        clientSecret: 'sk_live_xyz789abc123456',
+        redirectUris: ['https://app.example.com/auth/callback'],
+        scopes: ['profile', 'email'],
+        trusted: false,
+        createdAt: '2024-01-10',
+        status: 'active'
+      }
+    ]);
+  }, []);
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied to clipboard`);
+  };
+
+  const toggleSecretVisibility = (clientId: string) => {
+    setShowSecrets(prev => ({
+      ...prev,
+      [clientId]: !prev[clientId]
+    }));
+  };
+
+  const handleCreateClient = async () => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      const clientId = `wangov_${newClient.name.toLowerCase().replace(/\s+/g, '_')}_${Math.random().toString(36).substr(2, 12)}`;
+      const clientSecret = `sk_live_${Math.random().toString(36).substr(2, 24)}`;
+      
+      const client: OAuthClient = {
+        id: Date.now().toString(),
+        name: newClient.name,
+        clientId,
+        clientSecret,
+        redirectUris: newClient.redirectUris.split('\n').filter(uri => uri.trim()),
+        scopes: newClient.scopes,
+        trusted: newClient.trusted,
+        createdAt: new Date().toISOString().split('T')[0],
+        status: 'active'
+      };
+      
+      setClients(prev => [...prev, client]);
+      setShowCreateForm(false);
+      setNewClient({
+        name: '',
+        description: '',
+        redirectUris: '',
+        scopes: ['profile', 'email'],
+        trusted: false
+      });
+      
+      toast.success('OAuth client created successfully');
+    } catch (error) {
+      toast.error('Failed to create OAuth client');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteClient = async (clientId: string) => {
+    if (confirm('Are you sure you want to delete this OAuth client? This action cannot be undone.')) {
+      setClients(prev => prev.filter(client => client.id !== clientId));
+      toast.success('OAuth client deleted');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">SSO Management</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage OAuth clients and SSO integrations for your organization
+          </p>
+        </div>
+        <Button onClick={() => setShowCreateForm(true)} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Create OAuth Client
+        </Button>
+      </div>
+
+      <Tabs defaultValue="clients" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="clients" className="flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            OAuth Clients
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            SSO Settings
+          </TabsTrigger>
+          <TabsTrigger value="documentation" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            Integration Guide
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="clients" className="space-y-6">
+          {showCreateForm && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Create New OAuth Client</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="client-name">Application Name</Label>
+                    <Input
+                      id="client-name"
+                      placeholder="e.g., My WordPress Site"
+                      value={newClient.name}
+                      onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="client-description">Description (Optional)</Label>
+                    <Input
+                      id="client-description"
+                      placeholder="Brief description of your application"
+                      value={newClient.description}
+                      onChange={(e) => setNewClient(prev => ({ ...prev, description: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="redirect-uris">Authorized Redirect URIs</Label>
+                  <Textarea
+                    id="redirect-uris"
+                    placeholder="http://localhost:8080/wangov-auth/callback&#10;https://yoursite.com/auth/callback"
+                    value={newClient.redirectUris}
+                    onChange={(e) => setNewClient(prev => ({ ...prev, redirectUris: e.target.value }))}
+                    rows={3}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Enter one URI per line. These are the URLs WanGov will redirect to after authentication.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Button onClick={handleCreateClient} disabled={loading || !newClient.name}>
+                    {loading ? 'Creating...' : 'Create Client'}
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowCreateForm(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid gap-6">
+            {clients.map((client) => (
+              <Card key={client.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        {client.name}
+                        <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
+                          {client.status}
+                        </Badge>
+                        {client.trusted && (
+                          <Badge variant="outline" className="flex items-center gap-1">
+                            <Shield className="h-3 w-3" />
+                            Trusted
+                          </Badge>
+                        )}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Created {client.createdAt} • Last used {client.lastUsed || 'Never'}
+                      </p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => deleteClient(client.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Client ID</Label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="flex-1 p-2 bg-muted rounded text-sm font-mono">
+                          {client.clientId}
+                        </code>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyToClipboard(client.clientId, 'Client ID')}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium">Client Secret</Label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="flex-1 p-2 bg-muted rounded text-sm font-mono">
+                          {showSecrets[client.id] ? client.clientSecret : '••••••••••••••••••••••••'}
+                        </code>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleSecretVisibility(client.id)}
+                        >
+                          {showSecrets[client.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyToClipboard(client.clientSecret, 'Client Secret')}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium">Authorized Redirect URIs</Label>
+                    <div className="mt-1 space-y-1">
+                      {client.redirectUris.map((uri, index) => (
+                        <code key={index} className="block p-2 bg-muted rounded text-sm">
+                          {uri}
+                        </code>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium">Scopes</Label>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {client.scopes.map((scope) => (
+                        <Badge key={scope} variant="secondary">
+                          {scope}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>SSO Configuration</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <Shield className="h-4 w-4" />
+                <AlertDescription>
+                  Configure global SSO settings for your organization. These settings apply to all OAuth clients.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label>SSO Server URL</Label>
+                  <code className="block p-2 bg-muted rounded text-sm mt-1">
+                    http://localhost:3010
+                  </code>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    This is your organization's SSO endpoint URL
+                  </p>
+                </div>
+                
+                <div>
+                  <Label>Token Endpoint</Label>
+                  <code className="block p-2 bg-muted rounded text-sm mt-1">
+                    http://localhost:3010/auth/token
+                  </code>
+                </div>
+                
+                <div>
+                  <Label>Authorization Endpoint</Label>
+                  <code className="block p-2 bg-muted rounded text-sm mt-1">
+                    http://localhost:3010/auth/authorize
+                  </code>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="documentation" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Integration Guide</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">WordPress Integration</h3>
+                <p className="text-muted-foreground mb-4">
+                  Follow these steps to integrate WanGov ID with your WordPress site:
+                </p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium">1. Install the WanGov ID Plugin</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Download and install the WanGov ID WordPress plugin from your organization dashboard.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium">2. Configure Plugin Settings</h4>
+                    <p className="text-sm text-muted-foreground">
+                      In WordPress Admin → Settings → WanGov ID, enter your Client ID and Client Secret.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium">3. Set Callback URL</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Add your WordPress callback URL to the OAuth client configuration above.
+                    </p>
+                    <code className="block p-2 bg-muted rounded text-sm mt-1">
+                      https://yoursite.com/wangov-auth/callback
+                    </code>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Custom Integration</h3>
+                <p className="text-muted-foreground mb-4">
+                  For custom applications, use the standard OAuth 2.0 flow:
+                </p>
+                
+                <div className="space-y-2">
+                  <div>
+                    <h4 className="font-medium text-sm">Authorization URL</h4>
+                    <code className="block p-2 bg-muted rounded text-xs">
+                      GET http://localhost:3010/auth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_CALLBACK&response_type=code&state=RANDOM_STATE
+                    </code>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-sm">Token Exchange</h4>
+                    <code className="block p-2 bg-muted rounded text-xs">
+                      POST http://localhost:3010/auth/token<br/>
+                      Content-Type: application/x-www-form-urlencoded<br/>
+                      <br/>
+                      grant_type=authorization_code&code=AUTH_CODE&client_id=YOUR_CLIENT_ID&client_secret=YOUR_SECRET&redirect_uri=YOUR_CALLBACK
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default SSOManagement;

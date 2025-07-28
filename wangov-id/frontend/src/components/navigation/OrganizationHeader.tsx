@@ -2,6 +2,7 @@ import React, { useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { useAuth, User } from '../../contexts/AuthContext';
+import SearchBar from '../search/SearchBar';
 
 interface OrganizationHeaderProps {
   openSidebar: () => void;
@@ -49,6 +50,14 @@ const OrganizationHeader: React.FC<OrganizationHeaderProps> = ({ openSidebar, us
             </div>
           </div>
           <div className="flex items-center">
+            {/* Search Bar */}
+            <div className="hidden md:block w-64 lg:w-96 mr-4">
+              <SearchBar 
+                placeholder="Search applications, services..." 
+                variant="organization" 
+                userRole="organization_admin"
+              />
+            </div>
             <div className="hidden md:ml-4 md:flex-shrink-0 md:flex md:items-center">
               {/* API Keys */}
               <button className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3">

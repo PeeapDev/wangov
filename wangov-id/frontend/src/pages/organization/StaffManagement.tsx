@@ -11,6 +11,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
+import PermissionGuard from '../../components/organization/PermissionGuard';
 
 interface StaffMember {
   id: string;
@@ -26,7 +27,7 @@ interface StaffMember {
   permissions: string[];
 }
 
-const StaffManagement: React.FC = () => {
+const StaffManagementContent: React.FC = () => {
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -397,6 +398,14 @@ const StaffManagement: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const StaffManagement: React.FC = () => {
+  return (
+    <PermissionGuard permission="staffManagement">
+      <StaffManagementContent />
+    </PermissionGuard>
   );
 };
 

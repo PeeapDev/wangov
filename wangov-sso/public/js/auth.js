@@ -13,6 +13,30 @@ function showRegister() {
     document.getElementById('registerTab').className = 'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-white text-gray-900 shadow-sm';
 }
 
+// Registration confirmation modal functions
+function showRegisterConfirmation() {
+    document.getElementById('registrationModal').style.display = 'flex';
+}
+
+function closeRegisterConfirmation() {
+    document.getElementById('registrationModal').style.display = 'none';
+    
+    // Store the referrer URL to return to after cancellation
+    const referrer = document.referrer || window.location.origin;
+    
+    // If this is part of an OAuth flow and there's a client_id in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('client_id')) {
+        // Redirect back to the client application that initiated the flow
+        window.location.href = referrer;
+    }
+}
+
+function proceedToRegistration() {
+    // Redirect to the government website registration page
+    window.location.href = 'http://localhost:3003/register';
+}
+
 // Login type switching
 document.addEventListener('DOMContentLoaded', function() {
     const loginTypeRadios = document.querySelectorAll('input[name="loginType"]');
@@ -66,6 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 data.nin = formData.get('nin');
             }
+            
+            // Log for debugging
+            console.log('Login data:', { ...data, password: '***' });
 
             const response = await fetch('/auth/login', {
                 method: 'POST',
@@ -78,16 +105,46 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
 
             if (result.success) {
-                if (result.redirect) {
-                    // OAuth redirect
-                    showMessage('Authentication successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = result.redirect;
-                    }, 1000);
-                } else {
-                    // Regular login success
-                    showMessage('Login successful!', 'success');
-                }
+                // Show success message
+                showMessage('Authentication successful! Redirecting...', 'success');
+                
+                console.log('Login response:', result);
+                
+                // Handle OAuth redirection
+                setTimeout(() => {
+                    if (result.authCode && result.redirectUrl) {
+                        // Construct the redirect URL with the authorization code
+                        const redirectUrl = new URL(result.redirectUrl);
+                        redirectUrl.searchParams.set('code', result.authCode);
+                        redirectUrl.searchParams.set('state', result.state || new URLSearchParams(window.location.search).get('state'));
+                        
+                        console.log('Redirecting to:', redirectUrl.toString());
+                        window.location.href = redirectUrl.toString();
+                    } 
+                    else if (result.redirectUrl) {
+                        console.log('Redirecting to:', result.redirectUrl);
+                        window.location.href = result.redirectUrl;
+                    }
+                    else {
+                        console.log('No redirect URL found, constructing callback URL from referrer');
+                        // Fallback to referrer URL if available
+                        const referrer = document.referrer;
+                        if (referrer && referrer !== window.location.href) {
+                            // Extract the origin part of the referrer
+                            try {
+                                const referrerUrl = new URL(referrer);
+                                const callbackUrl = `${referrerUrl.origin}/auth/callback?code=${result.authCode}&state=${new URLSearchParams(window.location.search).get('state')}`;
+                                console.log('Fallback redirect to:', callbackUrl);
+                                window.location.href = callbackUrl;
+                            } catch (e) {
+                                console.error('Failed to parse referrer URL', e);
+                                showMessage('Login successful! You may now close this window and return to the application.', 'success');
+                            }
+                        } else {
+                            showMessage('Login successful! You may now close this window and return to the application.', 'success');
+                        }
+                    }
+                }, 1000);
             } else {
                 showMessage(result.error || 'Login failed', 'error');
             }

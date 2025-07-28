@@ -63,7 +63,7 @@
                         <div>
                             <p class="text-sm font-medium text-blue-800">Service Access Request</p>
                             <p class="text-xs text-blue-600 mt-1">
-                                <strong><%= oauth.client_id %></strong> is requesting access to your WanGov ID
+                                <strong><%= oauth.client_name || oauth.client_id %></strong> is requesting access to your WanGov ID
                             </p>
                         </div>
                     </div>
@@ -82,12 +82,13 @@
                     >
                         Sign In
                     </button>
-                    <a
-                        href="http://localhost:3001/register"
+                    <button
+                        type="button"
+                        onclick="showRegisterConfirmation()"
                         class="w-full py-2 px-4 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-center inline-block"
                     >
                         Register New ID
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Error/Success Messages -->
@@ -323,9 +324,46 @@
         </div>
     </div>
 
+    <!-- Registration Confirmation Modal -->
+    <div id="registrationModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" style="display: none;">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="ml-3 w-full">
+                    <h3 class="text-lg font-medium text-gray-900">Registration Confirmation</h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500">
+                            Registration requires NCRA verification, which will take several days to complete and verify. Do you want to proceed with your registration now?
+                        </p>
+                    </div>
+                    <div class="mt-4 flex space-x-3">
+                        <button
+                            type="button"
+                            onclick="closeRegisterConfirmation()"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
+                            Take me back
+                        </button>
+                        <button
+                            type="button"
+                            onclick="proceedToRegistration()"
+                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
+                            Yes, proceed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Auto-show signup form if in signup mode
-        <% if (signupMode) { %>
+        <% if (typeof signupMode !== 'undefined' && signupMode) { %>
         document.addEventListener('DOMContentLoaded', function() {
             // Wait a bit for the auth.js to load and define showRegister
             setTimeout(() => {

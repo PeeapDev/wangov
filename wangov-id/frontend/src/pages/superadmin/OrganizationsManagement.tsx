@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import VerificationBadge from '../../components/shared/VerificationBadge';
 import { 
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
@@ -33,13 +35,15 @@ interface Organization {
 }
 
 const OrganizationsManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [verificationFilter, setVerificationFilter] = useState('all');
+  const [showModal, setShowModal] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
     fetchOrganizations();
@@ -136,13 +140,12 @@ const OrganizationsManagement: React.FC = () => {
   };
 
   const handleViewOrg = (org: Organization) => {
-    setSelectedOrg(org);
-    setShowViewModal(true);
+    navigate(`/superadmin-dashboard/organizations/${org.id}`);
   };
 
   const handleEditOrg = (org: Organization) => {
     setSelectedOrg(org);
-    setShowEditModal(true);
+    setShowModal(true);
   };
 
   const handleDeleteOrg = (id: string) => {
@@ -186,22 +189,26 @@ const OrganizationsManagement: React.FC = () => {
     }
   };
 
-  const getVerificationBadge = (status: Organization['verificationStatus']) => {
+  const getStatusBadgeClass = (status: Organization['status']) => {
     const baseClasses = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
     switch (status) {
-      case 'verified':
-        return `${baseClasses} bg-blue-100 text-blue-800`;
-      case 'unverified':
-        return `${baseClasses} bg-orange-100 text-orange-800`;
-      case 'in-progress':
-        return `${baseClasses} bg-purple-100 text-purple-800`;
+      case 'active':
+        return `${baseClasses} bg-green-100 text-green-800`;
+      case 'inactive':
+        return `${baseClasses} bg-gray-100 text-gray-800`;
+      case 'suspended':
+        return `${baseClasses} bg-red-100 text-red-800`;
+      case 'pending':
+        return `${baseClasses} bg-yellow-100 text-yellow-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
 
   const filteredOrganizations = organizations
-    .filter(org => filterStatus === 'all' || org.status === filterStatus)
+    .filter(org => statusFilter === 'all' || org.status === statusFilter)
+    .filter(org => typeFilter === 'all' || org.type === typeFilter)
+    .filter(org => verificationFilter === 'all' || org.verificationStatus === verificationFilter)
     .filter(org => org.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                   org.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -309,9 +316,9 @@ const OrganizationsManagement: React.FC = () => {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setFilterStatus(tab.id)}
+                onClick={() => setStatusFilter(tab.id)}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md ${
-                  filterStatus === tab.id
+                  statusFilter === tab.id
                     ? 'bg-green-50 text-green-700'
                     : 'text-gray-500 hover:bg-gray-100'
                 }`}
@@ -383,14 +390,12 @@ const OrganizationsManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="mb-1">
-                        <span className={getStatusBadge(org.status)}>
+                        <span className={getStatusBadgeClass(org.status)}>
                           {org.status.charAt(0).toUpperCase() + org.status.slice(1)}
                         </span>
                       </div>
                       <div>
-                        <span className={getVerificationBadge(org.verificationStatus)}>
-                          {org.verificationStatus.charAt(0).toUpperCase() + org.verificationStatus.slice(1)}
-                        </span>
+                        <VerificationBadge status={org.verificationStatus} showText={true} />
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -487,13 +492,13 @@ const OrganizationsManagement: React.FC = () => {
       </div>
 
       {/* View Modal would be here - simplified for token limit */}
-      {showViewModal && selectedOrg && (
+      {showModal && selectedOrg && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-full max-w-md md:max-w-2xl shadow-lg rounded-md bg-white">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">Organization Details</h3>
               <button
-                onClick={() => setShowViewModal(false)}
+                onClick={() => setShowModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <span className="sr-only">Close</span>
@@ -505,7 +510,7 @@ const OrganizationsManagement: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => {
-                    setShowViewModal(false);
+                    setShowModal(false);
                     handleEditOrg(selectedOrg);
                   }}
                   className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
@@ -513,7 +518,7 @@ const OrganizationsManagement: React.FC = () => {
                   Edit Details
                 </button>
                 <button
-                  onClick={() => setShowViewModal(false)}
+                  onClick={() => setShowModal(false)}
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   Close
