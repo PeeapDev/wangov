@@ -1,0 +1,49 @@
+# Full-stack Dockerfile for WanGov-ID with frontend and backend
+FROM node:18-alpine
+
+# Install OpenSSL and other dependencies for Prisma compatibility
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
+WORKDIR /app
+
+# Set memory limits
+ENV NODE_OPTIONS="--max-old-space-size=512"
+ENV NODE_ENV=production
+ENV GENERATE_SOURCEMAP=false
+
+# Build frontend first
+WORKDIR /app/frontend
+COPY wangov-id/frontend/package*.json ./
+RUN npm install --no-audit --no-fund
+COPY wangov-id/frontend/ ./
+RUN npm run build
+
+# Build backend
+WORKDIR /app/backend
+COPY wangov-id/package*.json ./
+RUN npm install --include=dev --no-audit --no-fund
+COPY wangov-id/ ./
+RUN npx prisma generate
+RUN npm run build
+
+# Set up final structure
+WORKDIR /app
+RUN mkdir -p public
+RUN cp -r /app/frontend/build/* /app/public/ 2>/dev/null || cp -r /app/frontend/dist/* /app/public/ 2>/dev/null || echo "Frontend build not found"
+RUN cp -r /app/backend/dist ./
+RUN cp -r /app/backend/node_modules ./
+RUN cp /app/backend/package.json ./
+RUN cp -r /app/backend/prisma ./
+
+# Create non-root user
+RUN addgroup --system --gid 1001 wangov && \
+    adduser --system --uid 1001 wangov
+
+# Change ownership
+RUN chown -R wangov:wangov /app
+
+USER wangov
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]

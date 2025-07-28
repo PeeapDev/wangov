@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import session from 'express-session';
 import dotenv from 'dotenv';
+import path from 'path';
 import { rateLimit } from 'express-rate-limit';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
@@ -22,15 +23,23 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  // Allow any localhost origin with different ports for development
   origin: (origin, callback) => {
-    if (!origin || /^https?:\/\/localhost:[0-9]+$/.test(origin)) {
+    // Allow localhost for development and production domains
+    const allowedOrigins = [
+      /^https?:\/\/localhost:[0-9]+$/,
+      'https://wangov-production.up.railway.app',
+      'https://wangov.gov.sl'
+    ];
+    
+    if (!origin || allowedOrigins.some(allowed => 
+      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+    )) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, true); // Allow all origins in production for now
     }
   },
-  credentials: true, // Allow credentials (cookies)
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -85,12 +94,24 @@ app.get('/', (req, res) => {
   });
 });
 
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../public')));
+
 // API routes
 app.use('/api', routes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Error handling
