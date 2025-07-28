@@ -44,7 +44,7 @@ prisma.$connect()
   .then(() => {
     logger.info('Database connected successfully');
   })
-  .catch((error) => {
+  .catch((error: any) => {
     logger.error('Database connection error:', error);
     process.exit(1);
   });

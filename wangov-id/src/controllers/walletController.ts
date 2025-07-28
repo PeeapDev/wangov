@@ -45,7 +45,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to create wallet',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -75,7 +75,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve wallet',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -105,7 +105,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve wallet',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -135,7 +135,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve wallet',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -185,7 +185,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Transfer failed',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -235,7 +235,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Payment failed',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -281,7 +281,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to add funds',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -321,7 +321,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve transaction history',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -351,7 +351,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve transaction',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -392,7 +392,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to update wallet status',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -424,7 +424,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to verify wallet',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -447,7 +447,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve wallet statistics',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -481,7 +481,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to search wallets',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -514,7 +514,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve wallets',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
@@ -568,7 +568,7 @@ export class WalletController {
       res.status(500).json({
         success: false,
         message: 'Transfer failed',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }

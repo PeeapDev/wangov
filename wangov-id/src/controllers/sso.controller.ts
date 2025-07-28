@@ -395,7 +395,7 @@ export const generateToken = async (req: Request, res: Response, next: NextFunct
       const requestedScope = scope || 'api:access';
       const allowedScopes = organization.accessScope;
       
-      if (!allowedScopes.some(s => requestedScope.includes(s))) {
+      if (!allowedScopes.some((s: string) => requestedScope.includes(s))) {
         throw new AppError('Requested scope not allowed', 403);
       }
       

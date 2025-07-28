@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { walletController } from '../controllers/walletController';
-import { authMiddleware } from '../middleware/auth';
+import { authenticateJWT } from '../middleware/auth';
 
 const router = Router();
 
 // Apply authentication middleware to all wallet routes
-router.use(authMiddleware);
+router.use(authenticateJWT);
 
 /**
  * Wallet Management Routes

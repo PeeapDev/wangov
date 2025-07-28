@@ -155,7 +155,7 @@ class WalletService {
     `;
     const result = await pool.query(query, [ownerType, limit, offset]);
     
-    return result.rows.map(row => this.mapWalletFromDb(row));
+    return result.rows.map((row: any) => this.mapWalletFromDb(row));
   }
 
   /**
@@ -222,7 +222,7 @@ class WalletService {
       return this.mapTransactionFromDb(transactionResult.rows[0]);
     } catch (error) {
       await client.query('ROLLBACK');
-      throw new Error(`Transfer failed: ${error.message}`);
+      throw new Error(`Transfer failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       client.release();
     }
@@ -287,7 +287,7 @@ class WalletService {
       return this.mapTransactionFromDb(transactionResult.rows[0]);
     } catch (error) {
       await client.query('ROLLBACK');
-      throw new Error(`Payment failed: ${error.message}`);
+      throw new Error(`Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       client.release();
     }
@@ -341,7 +341,7 @@ class WalletService {
       return this.mapTransactionFromDb(transactionResult.rows[0]);
     } catch (error) {
       await client.query('ROLLBACK');
-      throw new Error(`Deposit failed: ${error.message}`);
+      throw new Error(`Deposit failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       client.release();
     }
@@ -380,7 +380,7 @@ class WalletService {
     params.push(limit, offset);
     
     const result = await pool.query(query, params);
-    return result.rows.map(row => this.mapTransactionFromDb(row));
+    return result.rows.map((row: any) => this.mapTransactionFromDb(row));
   }
 
   /**
@@ -474,7 +474,7 @@ class WalletService {
     params.push(limit);
     
     const result = await pool.query(query, params);
-    return result.rows.map(row => this.mapWalletFromDb(row));
+    return result.rows.map((row: any) => this.mapWalletFromDb(row));
   }
 
   /**
