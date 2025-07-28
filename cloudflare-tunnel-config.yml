@@ -1,0 +1,78 @@
+# Cloudflare Tunnel Configuration for WanGov Unified Digital Identity System
+# This creates beautiful subdomains like finance.wangov.com instead of ugly ?provider=finance URLs
+
+tunnel: wangov-digital-id
+credentials-file: ~/.cloudflared/wangov-digital-id.json
+
+# Ingress rules - order matters, most specific first
+ingress:
+  # Main NCRA Digital Identity Portal
+  - hostname: wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+  
+  # Government Service Provider Portals
+  - hostname: finance.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  - hostname: health.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  - hostname: education.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  - hostname: edsa.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  - hostname: nassit.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  - hostname: mbsse.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  # Tax Authority Portal (alternative name)
+  - hostname: tax.wangov.com
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  # Wildcard catch-all for any other subdomains
+  - hostname: "*.wangov.com"
+    service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      originServerName: wangov-production.up.railway.app
+  
+  # Default fallback
+  - service: http_status:404
+
+# Optional: Configure additional settings
+originRequest:
+  # Disable TLS verification for development
+  noTLSVerify: false
+  # Connection timeout
+  connectTimeout: 30s
+  # Keep alive connections
+  keepAliveConnections: 100
+  # HTTP2 origin
+  http2Origin: true

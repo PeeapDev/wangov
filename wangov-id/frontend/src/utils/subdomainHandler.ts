@@ -13,10 +13,21 @@
 export const getSubdomain = (): string | null => {
   // In a browser environment
   if (typeof window !== 'undefined') {
-    const { hostname, search } = window.location;
-    console.log('🔍 Subdomain detection - hostname:', hostname);
+    const { hostname, search, pathname } = window.location;
+    console.log('🔍 Subdomain detection - hostname:', hostname, 'pathname:', pathname);
     
-    // Check for provider parameter in URL (temporary solution for Railway)
+    // Check for path-based provider routing (e.g., /finance/, /health/)
+    const pathParts = pathname.split('/').filter(part => part.length > 0);
+    if (pathParts.length > 0) {
+      const firstPath = pathParts[0];
+      const validProviders = ['finance', 'health', 'education', 'edsa', 'nassit', 'mbsse', 'tax'];
+      if (validProviders.includes(firstPath)) {
+        console.log('🔍 Subdomain detection - found path-based provider:', firstPath);
+        return firstPath;
+      }
+    }
+    
+    // Check for provider parameter in URL (fallback)
     const urlParams = new URLSearchParams(search);
     const providerParam = urlParams.get('provider');
     if (providerParam) {
@@ -41,7 +52,7 @@ export const getSubdomain = (): string | null => {
     // Handle production environment with custom domains
     const parts = hostname.split('.');
     // If we have a subdomain (e.g., finance.wangov.sl)
-    if (parts.length > 2) {
+    if (parts.length > 2 && !hostname.includes('trycloudflare.com')) {
       const subdomain = parts[0] === 'www' ? null : parts[0];
       console.log('🔍 Subdomain detection - found production subdomain:', subdomain);
       return subdomain;
@@ -69,15 +80,32 @@ export const getProviderUrl = (provider: string): string => {
       return `${protocol}//${provider}.localhost${portStr}`;
     }
     
-    // In production, use provider parameter until custom domain is set up
-    return `${protocol}//${hostname}${portStr}/?provider=${provider}`;
+    // For Cloudflare tunnel or production, use clean path-based URLs
+    return `${protocol}//${hostname}${portStr}/${provider}/`;
   }
   
-  return `/?provider=${provider}`;
+  return `/${provider}/`;
 };
 
 /**
- * Checks if the current hostname has a provider subdomain
+ * Get clean provider URLs for the tunnel
+ */
+export const getProviderUrls = () => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  
+  return {
+    finance: `${baseUrl}/finance/`,
+    health: `${baseUrl}/health/`,
+    education: `${baseUrl}/education/`,
+    edsa: `${baseUrl}/edsa/`,
+    nassit: `${baseUrl}/nassit/`,
+    mbsse: `${baseUrl}/mbsse/`,
+    tax: `${baseUrl}/tax/`
+  };
+};
+
+/**
+ * Checks if the current URL indicates a provider portal
  */
 export const isProviderSubdomain = async (): Promise<boolean> => {
   const subdomain = getSubdomain();

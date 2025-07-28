@@ -1,0 +1,17 @@
+# Free Cloudflare Tunnel Configuration for WanGov
+# This uses Cloudflare's free tunnel URLs (no custom domain required)
+
+tunnel: wangov-digital-id
+credentials-file: ~/.cloudflared/wangov-digital-id.json
+
+# Simple ingress - all traffic goes to Railway
+ingress:
+  # Catch all traffic and route to Railway
+  - service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app
+      noTLSVerify: false
+      connectTimeout: 30s
+      http2Origin: true
+
+# This will give you a free URL like: https://wangov-digital-id.trycloudflare.com
