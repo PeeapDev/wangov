@@ -9,23 +9,28 @@ WORKDIR /app
 COPY wangov-id/package*.json ./backend/
 COPY wangov-id/frontend/package*.json ./frontend/
 
-# Install dependencies
-RUN cd backend && npm ci --only=production
-RUN cd frontend && npm ci
+# Install dependencies with memory optimizations
+ENV NODE_OPTIONS="--max-old-space-size=512"
+ENV GENERATE_SOURCEMAP=false
+RUN cd backend && npm install --no-optional --production --no-audit --no-fund
+RUN cd frontend && npm install --no-optional --production --no-audit --no-fund
 
-# Build frontend
+# Build frontend with memory optimizations
 FROM base AS frontend-builder
 WORKDIR /app
+ENV NODE_OPTIONS="--max-old-space-size=512"
+ENV GENERATE_SOURCEMAP=false
 COPY wangov-id/frontend/package*.json ./
-RUN npm ci
+RUN npm install --no-optional --production --no-audit --no-fund
 COPY wangov-id/frontend/ ./
 RUN npm run build
 
-# Build backend
+# Build backend with memory optimizations
 FROM base AS backend-builder
 WORKDIR /app
+ENV NODE_OPTIONS="--max-old-space-size=512"
 COPY wangov-id/package*.json ./
-RUN npm ci
+RUN npm install --no-optional --production --no-audit --no-fund
 COPY wangov-id/ ./
 RUN npm run build
 
