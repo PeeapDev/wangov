@@ -1,13 +1,8 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "watchPatterns": [
-      "wangov-id/**/*.js",
-      "wangov-id/**/*.jsx",
-      "wangov-id/**/*.json"
-    ],
-    "nixpacksConfigPath": "nixpacks.toml"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile.railway"
   },
   "deploy": {
     "numReplicas": 1,
