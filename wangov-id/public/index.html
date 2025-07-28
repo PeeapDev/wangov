@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanGov - Sierra Leone Digital Identity System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .flag {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .status {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .api-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .api-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .api-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .version {
+            margin-top: 2rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="flag">🇸🇱</div>
+        <h1>WanGov</h1>
+        <p class="subtitle">Sierra Leone National Digital Identity System</p>
+        
+        <div class="status">
+            <h3>✅ System Operational</h3>
+            <p>Backend API and Wallet System are running successfully</p>
+        </div>
+        
+        <div class="api-links">
+            <a href="/api/health" class="api-link">
+                <h4>🏥 Health Check</h4>
+                <p>System status</p>
+            </a>
+            <a href="/api/auth" class="api-link">
+                <h4>🔐 Authentication</h4>
+                <p>Login & Auth</p>
+            </a>
+            <a href="/api/citizens" class="api-link">
+                <h4>👥 Citizens</h4>
+                <p>Citizen services</p>
+            </a>
+            <a href="/api/organizations" class="api-link">
+                <h4>🏢 Organizations</h4>
+                <p>Organization portal</p>
+            </a>
+            <a href="/api/admin" class="api-link">
+                <h4>🏛️ Admin</h4>
+                <p>Admin dashboard</p>
+            </a>
+            <a href="/api/sso" class="api-link">
+                <h4>🔑 SSO</h4>
+                <p>Single Sign-On</p>
+            </a>
+        </div>
+        
+        <div class="version">
+            <p>Version 1.0.0 | Production Environment</p>
+            <p>Wallet System | Digital Identity | Government Services</p>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch and display system status
+            fetch('/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('System Status:', data);
+                })
+                .catch(error => {
+                    console.log('API not available:', error);
+                });
+        });
+    </script>
+</body>
+</html>
