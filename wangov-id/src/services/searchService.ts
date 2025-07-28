@@ -162,8 +162,10 @@ class SearchService {
       delete: async () => ({ body: { result: 'deleted' } })
     } as any;
     
-    // Initialize indices if they don't exist
-    this.initializeIndices();
+    // Initialize indices if they don't exist (optional for deployment)
+    this.initializeIndices().catch(error => {
+      console.warn('OpenSearch initialization failed (using mock client):', error.message);
+    });
   }
 
   /**
@@ -171,6 +173,12 @@ class SearchService {
    */
   public async initializeIndices(): Promise<void> {
     try {
+      // Skip initialization if using mock client
+      if (!this.client.indices) {
+        console.log('Using mock OpenSearch client - skipping index initialization');
+        return;
+      }
+      
       // Check and create each index with proper mappings
       for (const [type, indexName] of Object.entries(this.indices)) {
         const exists = await this.client.indices.exists({ index: indexName });
