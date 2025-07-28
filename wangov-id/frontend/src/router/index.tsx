@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // SuperAdmin Pages
+import OrganizationDetail from '../pages/superadmin/OrganizationDetail';
 import SystemLogs from '../pages/superadmin/SystemLogs';
 import SuperAdminAnalytics from '../pages/superadmin/Analytics';
 import Communication from '../pages/superadmin/Communication';
@@ -55,18 +56,26 @@ import NCRADashboard from '../pages/ncra/NCRADashboard';
 import NCRALogin from '../pages/ncra/NCRALogin';
 import NCRAApplications from '../pages/ncra/NCRAApplications';
 import NCRAInvoices from '../pages/ncra/NCRAInvoices';
+import NCRACitizensManagement from '../pages/ncra/CitizensManagement';
+import RejectedCitizens from '../pages/ncra/RejectedCitizens';
+
+// NCRA Application Pages
+import AllApplications from '../pages/ncra/applications/AllApplications';
+import ProcessingApplications from '../pages/ncra/applications/ProcessingApplications';
+import PendingApplications from '../pages/ncra/applications/PendingApplications';
 
 // Organization Pages
 import OrganizationDashboard from '../pages/organization/OrganizationDashboard';
 import BusinessRegistration from '../pages/organization/BusinessRegistration';
 import DeveloperSandbox from '../pages/organization/DeveloperSandbox';
 import SdkDocumentation from '../pages/organization/SdkDocumentation';
-import StaffManagement from '../pages/organization/StaffManagement';
 import OrgAnalytics from '../pages/organization/Analytics';
 import OrgSettings from '../pages/organization/Settings';
 import Members from '../pages/organization/Members';
 import Verification from '../pages/organization/Verification';
+import StaffManagement from '../pages/organization/StaffManagement';
 import OrganizationInvoices from '../pages/organization/OrganizationInvoices';
+import BusinessSSOManagement from '../pages/organization/BusinessSSOManagement';
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -110,7 +119,7 @@ const DashboardRedirect: React.FC = () => {
 // Route Protection Components
 const ProtectedRoute: React.FC<{ 
   children?: React.ReactNode;
-  requiredRole?: 'citizen' | 'organization' | 'organization-staff' | 'admin' | 'superadmin' | 'superadmin-staff'; 
+  requiredRole?: 'citizen' | 'organization' | 'organization-staff' | 'admin' | 'superadmin' | 'superadmin-staff' | 'ncra'; 
 }> = ({ children, requiredRole }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   
@@ -124,25 +133,42 @@ const ProtectedRoute: React.FC<{
   }
   
   if (!isAuthenticated) {
-    // Redirect to the appropriate login page based on the required role
-    if (requiredRole === 'superadmin' || requiredRole === 'superadmin-staff' || requiredRole === 'admin') {
-      return <Navigate to="/gov/auth/login" replace state={{ from: window.location.pathname }} />;
+    if (requiredRole === 'ncra') {
+      return <Navigate to="/ncra/auth/login" replace />;
     } else if (requiredRole === 'organization' || requiredRole === 'organization-staff') {
-      return <Navigate to="/org/auth/login" replace state={{ from: window.location.pathname }} />;
+      return <Navigate to="/org/auth/login" replace />;
+    } else if (requiredRole === 'admin' || requiredRole === 'superadmin' || requiredRole === 'superadmin-staff') {
+      return <Navigate to="/gov/auth/login" replace />;
     } else {
       // Default to citizen login
       return <Navigate to="/login" replace state={{ from: window.location.pathname }} />;
     }
   }
   
-  if (requiredRole && user?.role !== requiredRole) {
+  // Special handling for NCRA routes - check if user is NCRA even if role is different
+  if (requiredRole === 'ncra' && user?.isNCRA === true) {
+    // Allow access for NCRA users even if their role is organization or organization-staff
+    // This ensures backward compatibility
+  } 
+  // Standard role checking for other roles
+  else if (requiredRole && user?.role !== requiredRole) {
     // Redirect to appropriate dashboard based on role if trying to access unauthorized route
     switch (user?.role) {
+      case 'ncra':
+        return <Navigate to="/ncra" replace />;
       case 'citizen':
         return <Navigate to="/citizen" replace />;
       case 'organization':
+        // Check for NCRA flag here too
+        if (user?.isNCRA === true) {
+          return <Navigate to="/ncra" replace />;
+        }
         return <Navigate to="/organization" replace />;
       case 'organization-staff':
+        // Check for NCRA flag here too
+        if (user?.isNCRA === true) {
+          return <Navigate to="/ncra" replace />;
+        }
         return <Navigate to="/organization-staff" replace />;
       case 'admin':
         return <Navigate to="/admin" replace />;
@@ -156,6 +182,8 @@ const ProtectedRoute: React.FC<{
           return <Navigate to="/gov/auth/login" replace />;
         } else if (requiredRole === 'organization' || requiredRole === 'organization-staff') {
           return <Navigate to="/org/auth/login" replace />;
+        } else if (requiredRole === 'ncra') {
+          return <Navigate to="/ncra/auth/login" replace />;
         } else {
           return <Navigate to="/login" replace />;
         }
@@ -169,7 +197,7 @@ const ProtectedRoute: React.FC<{
 // Public Route - redirects to dashboard if already authenticated
 const PublicRoute: React.FC<{ 
   children?: React.ReactNode;
-  routeType?: 'citizen' | 'government' | 'organization';
+  routeType?: 'citizen' | 'government' | 'organization' | 'ncra';
 }> = ({ children, routeType = 'citizen' }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   
@@ -184,6 +212,8 @@ const PublicRoute: React.FC<{
   if (isAuthenticated) {
     // Redirect to appropriate dashboard based on role
     switch (user?.role) {
+      case 'ncra':
+        return <Navigate to="/ncra" replace />;
       case 'citizen':
         return <Navigate to="/citizen" replace />;
       case 'organization':
@@ -354,6 +384,14 @@ const router = createBrowserRouter([
         element: <Members />,
       },
       {
+        path: "staff",
+        element: <StaffManagement />,
+      },
+      {
+        path: "sso",
+        element: <BusinessSSOManagement />,
+      },
+      {
         path: "services",
         element: <div className="p-4">Organization Services Page</div>,
       },
@@ -460,6 +498,10 @@ const router = createBrowserRouter([
       {
         path: "organizations",
         element: <OrganizationsManagement />,
+      },
+      {
+        path: "organizations/:orgId",
+        element: <OrganizationDetail />,
       },
       {
         path: "admins",
@@ -665,13 +707,17 @@ const router = createBrowserRouter([
   // NCRA Routes (Public Login)
   {
     path: "/ncra/auth/login",
-    element: <PublicRoute routeType="organization"><NCRALogin /></PublicRoute>,
+    element: <PublicRoute routeType="ncra"><NCRALogin /></PublicRoute>,
+  },
+  {
+    path: "/ncra/login",
+    element: <Navigate to="/ncra/auth/login" replace />,
   },
 
   // NCRA Routes (Protected)
   {
     path: "/ncra",
-    element: <ProtectedRoute requiredRole="organization"><NCRALayout /></ProtectedRoute>,
+    element: <ProtectedRoute requiredRole="ncra"><NCRALayout /></ProtectedRoute>,
     children: [
       {
         index: true,
@@ -680,10 +726,32 @@ const router = createBrowserRouter([
       {
         path: "applications",
         element: <NCRAApplications />,
+        children: [
+          {
+            index: true,
+            element: <AllApplications />,
+          },
+          {
+            path: "processing",
+            element: <ProcessingApplications />,
+          },
+          {
+            path: "pending",
+            element: <PendingApplications />,
+          },
+        ],
       },
       {
         path: "invoices/*",
         element: <NCRAInvoices />,
+      },
+      {
+        path: "citizens",
+        element: <NCRACitizensManagement />,
+      },
+      {
+        path: "rejected",
+        element: <RejectedCitizens />,
       },
       // Add more NCRA routes here as we build them
       // { path: "appointments", element: <NCRAAppointments /> },
