@@ -13,8 +13,16 @@
 export const getSubdomain = (): string | null => {
   // In a browser environment
   if (typeof window !== 'undefined') {
-    const { hostname } = window.location;
+    const { hostname, search } = window.location;
     console.log('🔍 Subdomain detection - hostname:', hostname);
+    
+    // Check for provider parameter in URL (temporary solution for Railway)
+    const urlParams = new URLSearchParams(search);
+    const providerParam = urlParams.get('provider');
+    if (providerParam) {
+      console.log('🔍 Subdomain detection - found provider param:', providerParam);
+      return providerParam;
+    }
     
     // Handle localhost development environment
     if (hostname.includes('localhost')) {
@@ -30,18 +38,42 @@ export const getSubdomain = (): string | null => {
       return null;
     }
     
-    // Handle production environment
+    // Handle production environment with custom domains
     const parts = hostname.split('.');
-    // If we have a subdomain (e.g., app.wangov.sl)
+    // If we have a subdomain (e.g., finance.wangov.sl)
     if (parts.length > 2) {
-      return parts[0] === 'www' ? null : parts[0];
+      const subdomain = parts[0] === 'www' ? null : parts[0];
+      console.log('🔍 Subdomain detection - found production subdomain:', subdomain);
+      return subdomain;
     }
     
+    console.log('🔍 Subdomain detection - no subdomain found');
     return null;
   }
   
   // In a non-browser environment (SSR)
   return null;
+};
+
+/**
+ * Get provider URL for testing subdomains in production
+ * This creates URLs with provider parameters until custom domains are set up
+ */
+export const getProviderUrl = (provider: string): string => {
+  if (typeof window !== 'undefined') {
+    const { protocol, hostname, port } = window.location;
+    const portStr = port ? `:${port}` : '';
+    
+    // In development, use actual subdomains
+    if (hostname.includes('localhost')) {
+      return `${protocol}//${provider}.localhost${portStr}`;
+    }
+    
+    // In production, use provider parameter until custom domain is set up
+    return `${protocol}//${hostname}${portStr}/?provider=${provider}`;
+  }
+  
+  return `/?provider=${provider}`;
 };
 
 /**
