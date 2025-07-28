@@ -72,8 +72,8 @@ app.use(morgan('combined', { stream }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Welcome route
-app.get('/', (req, res) => {
+// Service info endpoint
+app.get('/api/info', (req, res) => {
   res.json({
     service: 'WanGov-ID',
     version: '1.0.0',

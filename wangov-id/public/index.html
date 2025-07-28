@@ -136,10 +136,11 @@
         // Add some interactivity
         document.addEventListener('DOMContentLoaded', function() {
             // Fetch and display system status
-            fetch('/api/health')
+            fetch('/api/info')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('System Status:', data);
+                    console.log('System Info:', data);
+                    // Update page with real data if needed
                 })
                 .catch(error => {
                     console.log('API not available:', error);
