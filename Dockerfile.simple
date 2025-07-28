@@ -16,6 +16,9 @@ RUN npm install --include=dev --no-audit --no-fund
 # Copy backend source code
 COPY wangov-id/ ./
 
+# Generate Prisma client
+RUN npx prisma generate
+
 # Build backend
 RUN npm run build
 
