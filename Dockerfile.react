@@ -69,7 +69,7 @@ COPY --from=backend-builder --chown=wangov:wangov /app/package.json ./package.js
 COPY --from=backend-builder --chown=wangov:wangov /app/prisma ./prisma
 
 # Copy React build to public directory
-COPY --from=frontend-builder --chown=wangov:wangov /app/frontend/build ./public
+COPY --from=frontend-builder --chown=wangov:wangov /app/frontend/dist ./public
 
 USER wangov
 
