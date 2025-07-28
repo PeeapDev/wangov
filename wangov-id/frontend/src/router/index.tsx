@@ -50,6 +50,7 @@ import RegistrationConfirmation from '../pages/public/RegistrationConfirmation';
 
 // Citizen Pages
 import CitizenDashboard from '../pages/citizen/CitizenDashboard';
+import CitizenWallet from '../pages/citizen/CitizenWallet';
 
 // NCRA Pages
 import NCRADashboard from '../pages/ncra/NCRADashboard';
@@ -58,6 +59,7 @@ import NCRAApplications from '../pages/ncra/NCRAApplications';
 import NCRAInvoices from '../pages/ncra/NCRAInvoices';
 import NCRACitizensManagement from '../pages/ncra/CitizensManagement';
 import RejectedCitizens from '../pages/ncra/RejectedCitizens';
+import NCRAWallet from '../pages/ncra/NCRAWallet';
 
 // NCRA Application Pages
 import AllApplications from '../pages/ncra/applications/AllApplications';
@@ -76,10 +78,17 @@ import Verification from '../pages/organization/Verification';
 import StaffManagement from '../pages/organization/StaffManagement';
 import OrganizationInvoices from '../pages/organization/OrganizationInvoices';
 import BusinessSSOManagement from '../pages/organization/BusinessSSOManagement';
+import OrganizationWallet from '../pages/organization/OrganizationWallet';
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminInvoices from '../pages/admin/AdminInvoices';
+
+// Government Pages
+import GovernmentWallet from '../pages/government/GovernmentWallet';
+
+// SuperAdmin Wallet
+import SuperAdminWallet from '../pages/superadmin/SuperAdminWallet';
 
 // Additional Pages
 import OAuthCallback from '../pages/auth/OAuthCallback';
@@ -360,6 +369,10 @@ const router = createBrowserRouter([
         element: <div className="p-4">Account Settings Page</div>,
       },
       {
+        path: "wallet",
+        element: <CitizenWallet />,
+      },
+      {
         path: "dashboard",
         element: <Navigate to="/citizen" replace />,
       },
@@ -428,6 +441,10 @@ const router = createBrowserRouter([
         element: <OrganizationInvoices />,
       },
       {
+        path: "wallet",
+        element: <OrganizationWallet />,
+      },
+      {
         path: "dashboard",
         element: <Navigate to="/organization" replace />,
       },
@@ -474,6 +491,10 @@ const router = createBrowserRouter([
       {
         path: "invoices/*",
         element: <AdminInvoices />,
+      },
+      {
+        path: "wallet",
+        element: <GovernmentWallet />,
       },
       {
         path: "dashboard",
@@ -596,6 +617,10 @@ const router = createBrowserRouter([
       {
         path: "invoices/*",
         element: <SuperAdminInvoices />,
+      },
+      {
+        path: "wallet",
+        element: <SuperAdminWallet />,
       },
       {
         path: "dashboard",
@@ -752,6 +777,10 @@ const router = createBrowserRouter([
       {
         path: "rejected",
         element: <RejectedCitizens />,
+      },
+      {
+        path: "wallet",
+        element: <NCRAWallet />,
       },
       // Add more NCRA routes here as we build them
       // { path: "appointments", element: <NCRAAppointments /> },

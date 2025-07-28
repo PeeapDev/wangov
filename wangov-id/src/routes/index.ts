@@ -7,6 +7,7 @@ import ssoRoutes from './sso.routes';
 import healthRoutes from './health.routes';
 import invoiceRoutes from './invoice.routes';
 import searchRoutes from './searchRoutes';
+import walletRoutes from './walletRoutes';
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use('/organizations', organizationRoutes);
 router.use('/sso', ssoRoutes);
 router.use('/invoices', invoiceRoutes);
 router.use('/search', searchRoutes);
+router.use('/wallet', walletRoutes);
 
 export default router;
