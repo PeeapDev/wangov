@@ -1,0 +1,21 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <rect width="1200" height="600" fill="url(#paint0_linear)" />
+  
+  <!-- Flag-inspired elements -->
+  <rect y="0" width="1200" height="200" fill="#006847" />
+  <rect y="200" width="1200" height="200" fill="white" />
+  <rect y="400" width="1200" height="200" fill="#0072C6" />
+  
+  <!-- Abstract shapes -->
+  <circle cx="300" cy="300" r="100" fill="#D4AF37" opacity="0.3" />
+  <circle cx="900" cy="300" r="150" fill="#D4AF37" opacity="0.2" />
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="600" y1="0" x2="600" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#006847" stop-opacity="0.05" />
+      <stop offset="1" stop-color="#0072C6" stop-opacity="0.05" />
+    </linearGradient>
+  </defs>
+</svg>
