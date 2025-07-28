@@ -2,13 +2,13 @@
 nixPkgs = ["nodejs", "nginx"]
 
 [phases.install]
-cmds = ["cd wangov-id && npm install --no-optional --production --no-audit --no-fund"]
+cmds = ["cd wangov-id && npm install --no-optional --no-audit --no-fund"]
 cacheDirectories = ["wangov-id/node_modules"]
 
 [phases.build]
 cmds = [
   "cd wangov-id && npm run build",
-  "cd wangov-id/frontend && npm install --no-optional --production --no-audit --no-fund && npm run build"
+  "cd wangov-id/frontend && npm install --no-optional --no-audit --no-fund && npm run build"
 ]
 
 [start]

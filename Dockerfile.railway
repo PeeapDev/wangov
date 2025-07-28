@@ -14,8 +14,8 @@ COPY wangov-id/package*.json ./backend/
 COPY wangov-id/frontend/package*.json ./frontend/
 
 # Install dependencies with memory optimizations
-RUN cd backend && npm install --no-optional --production --no-audit --no-fund
-RUN cd frontend && npm install --no-optional --production --no-audit --no-fund
+RUN cd backend && npm install --no-optional --no-audit --no-fund
+RUN cd frontend && npm install --no-optional --no-audit --no-fund
 
 # Build frontend with memory optimizations
 FROM base AS frontend-builder
@@ -23,7 +23,7 @@ WORKDIR /app
 ENV NODE_OPTIONS="--max-old-space-size=512"
 ENV GENERATE_SOURCEMAP=false
 COPY wangov-id/frontend/package*.json ./
-RUN npm install --no-optional --production --no-audit --no-fund
+RUN npm install --no-optional --no-audit --no-fund
 COPY wangov-id/frontend/ ./
 RUN npm run build
 
@@ -32,7 +32,7 @@ FROM base AS backend-builder
 WORKDIR /app
 ENV NODE_OPTIONS="--max-old-space-size=512"
 COPY wangov-id/package*.json ./
-RUN npm install --no-optional --production --no-audit --no-fund
+RUN npm install --no-optional --no-audit --no-fund
 COPY wangov-id/ ./
 RUN npm run build
 
