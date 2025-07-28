@@ -1,0 +1,22 @@
+[phases.setup]
+nixPkgs = ["nodejs", "nginx"]
+
+[phases.install]
+cmds = ["cd wangov-id && npm install --no-optional --production --no-audit --no-fund"]
+cacheDirectories = ["wangov-id/node_modules"]
+
+[phases.build]
+cmds = [
+  "cd wangov-id && npm run build",
+  "cd wangov-id/frontend && npm install --no-optional --production --no-audit --no-fund && npm run build"
+]
+
+[start]
+cmd = "cd wangov-id && node dist/server.js"
+
+[phases.setup.env]
+NODE_OPTIONS = "--max-old-space-size=512"
+
+[phases.build.env]
+NODE_OPTIONS = "--max-old-space-size=512"
+GENERATE_SOURCEMAP = "false"
