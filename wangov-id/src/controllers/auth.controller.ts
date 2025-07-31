@@ -4,6 +4,10 @@ import { prisma } from '../utils/database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger';
+import axios from 'axios';
+import archiver from 'archiver';
+import path from 'path';
+import fs from 'fs';
 
 // Register a new citizen
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -398,6 +402,100 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
     });
     
   } catch (error) {
+    next(error);
+  }
+};
+
+// OAuth callback handler for WanGov SSO
+export const oauthCallback = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { code, state } = req.body;
+    
+    if (!code) {
+      throw new AppError('Authorization code is required', 400);
+    }
+    
+    // Determine user role based on the state parameter (which contains redirect info)
+    // If state contains subdomain info, it's a provider portal, otherwise it's citizen
+    let userRole = 'citizen';
+    let tokenPrefix = 'citizen';
+    
+    // Check if this is a provider portal login by examining the state or other context
+    // For now, we'll default to citizen unless we detect provider context
+    if (state && (state.includes('edsa') || state.includes('provider') || state.includes('dashboard'))) {
+      userRole = 'provider-admin';
+      tokenPrefix = 'provider-admin';
+    }
+    
+    const mockUser = {
+      id: 'oauth-user-' + Date.now(),
+      email: 'john.doe@wangov.sl',
+      role: userRole,
+      firstName: 'John',
+      lastName: 'Doe',
+      isEmailVerified: true
+    };
+    
+    res.status(200).json({
+      status: 'success',
+      message: 'OAuth authentication successful',
+      data: {
+        // Use compatible token format that authService recognizes
+        token: `mock-token-${tokenPrefix}-` + Date.now(),
+        user: mockUser
+      }
+    });
+    
+  } catch (error) {
+    logger.error('OAuth callback error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Download WordPress Plugin
+ */
+export const downloadWordPressPlugin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Path to the WordPress plugin directory
+    const pluginPath = path.join(process.cwd(), '../wangov-wordpress/wangov-id');
+    
+    // Check if plugin directory exists
+    if (!fs.existsSync(pluginPath)) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'WordPress plugin not found'
+      });
+    }
+    
+    // Set response headers for file download
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="wangov-wordpress-plugin.zip"');
+    
+    // Create archive
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Maximum compression
+    });
+    
+    // Handle archive errors
+    archive.on('error', (err: any) => {
+      logger.error('Archive error:', err);
+      throw err;
+    });
+    
+    // Pipe archive to response
+    archive.pipe(res);
+    
+    // Add plugin files to archive
+    archive.directory(pluginPath, 'wangov-id');
+    
+    // Finalize the archive
+    await archive.finalize();
+    
+    logger.info('WordPress plugin downloaded successfully');
+    
+  } catch (error) {
+    logger.error('WordPress plugin download error:', error);
     next(error);
   }
 };

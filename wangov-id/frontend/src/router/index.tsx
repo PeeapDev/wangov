@@ -87,6 +87,9 @@ import AdminInvoices from '../pages/admin/AdminInvoices';
 // Government Pages
 import GovernmentWallet from '../pages/government/GovernmentWallet';
 
+// Test Pages
+import WordPressDownload from '../pages/test/WordPressDownload';
+
 // SuperAdmin Wallet
 import SuperAdminWallet from '../pages/superadmin/SuperAdminWallet';
 
@@ -161,30 +164,42 @@ const ProtectedRoute: React.FC<{
   } 
   // Standard role checking for other roles
   else if (requiredRole && user?.role !== requiredRole) {
+    // Get current path to prevent redirect loops
+    const currentPath = window.location.pathname;
+    
     // Redirect to appropriate dashboard based on role if trying to access unauthorized route
     switch (user?.role) {
       case 'ncra':
-        return <Navigate to="/ncra" replace />;
+        if (currentPath !== '/ncra') return <Navigate to="/ncra" replace />;
+        break;
       case 'citizen':
-        return <Navigate to="/citizen" replace />;
+        if (currentPath !== '/citizen') return <Navigate to="/citizen" replace />;
+        break;
       case 'organization':
         // Check for NCRA flag here too
         if (user?.isNCRA === true) {
-          return <Navigate to="/ncra" replace />;
+          if (currentPath !== '/ncra') return <Navigate to="/ncra" replace />;
+        } else {
+          if (currentPath !== '/organization') return <Navigate to="/organization" replace />;
         }
-        return <Navigate to="/organization" replace />;
+        break;
       case 'organization-staff':
         // Check for NCRA flag here too
         if (user?.isNCRA === true) {
-          return <Navigate to="/ncra" replace />;
+          if (currentPath !== '/ncra') return <Navigate to="/ncra" replace />;
+        } else {
+          if (currentPath !== '/organization-staff') return <Navigate to="/organization-staff" replace />;
         }
-        return <Navigate to="/organization-staff" replace />;
+        break;
       case 'admin':
-        return <Navigate to="/admin" replace />;
+        if (currentPath !== '/admin') return <Navigate to="/admin" replace />;
+        break;
       case 'superadmin':
-        return <Navigate to="/superadmin-dashboard" replace />;
+        if (currentPath !== '/superadmin-dashboard') return <Navigate to="/superadmin-dashboard" replace />;
+        break;
       case 'superadmin-staff':
-        return <Navigate to="/superadmin-admin" replace />;
+        if (currentPath !== '/superadmin-admin') return <Navigate to="/superadmin-admin" replace />;
+        break;
       default:
         // If role is undefined or not recognized, redirect to appropriate login page
         if (requiredRole === 'superadmin' || requiredRole === 'superadmin-staff' || requiredRole === 'admin') {
@@ -197,6 +212,15 @@ const ProtectedRoute: React.FC<{
           return <Navigate to="/login" replace />;
         }
     }
+    
+    // If we reach here, it means we're already on the correct route but with wrong role
+    // Show unauthorized message instead of redirecting
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
+        <p className="text-gray-600">You don't have permission to access this page.</p>
+      </div>
+    </div>;
   }
   
   // If all checks pass, render the children
@@ -293,6 +317,10 @@ const router = createBrowserRouter([
       {
         path: "/register/confirmation",
         element: <PublicRoute><RegistrationConfirmation /></PublicRoute>,
+      },
+      {
+        path: "/test/wordpress-download",
+        element: <WordPressDownload />,
       },
       {
         path: "/auth/callback",

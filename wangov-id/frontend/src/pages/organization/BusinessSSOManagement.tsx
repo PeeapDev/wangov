@@ -8,7 +8,8 @@ import {
   CheckCircleIcon,
   ClockIcon,
   XCircleIcon,
-  PlusIcon
+  PlusIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
@@ -116,6 +117,30 @@ const BusinessSSOManagement: React.FC = () => {
       ...prev,
       [businessId]: !prev[businessId]
     }));
+  };
+
+  const handleDownloadWordPressPlugin = async () => {
+    try {
+      const response = await fetch('http://localhost:3004/api/auth/wordpress-plugin');
+      if (!response.ok) {
+        throw new Error('Failed to download plugin');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'wangov-wordpress-plugin.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('WordPress plugin downloaded successfully!');
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Failed to download WordPress plugin');
+    }
   };
 
   if (isLoading) {
@@ -532,7 +557,18 @@ const BusinessSSOManagement: React.FC = () => {
                       <div className="bg-blue-50 p-4 rounded-md mb-4">
                         <h5 className="font-medium text-blue-800 mb-2">🔧 Configuration Steps</h5>
                         <ol className="list-decimal list-inside space-y-2 text-sm text-blue-700">
-                          <li>Upload the plugin to your WordPress site</li>
+                          <li className="mb-3">
+                            Upload the plugin to your WordPress site
+                            <div className="mt-2">
+                              <button 
+                                onClick={handleDownloadWordPressPlugin}
+                                className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                              >
+                                <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
+                                Download WordPress Plugin
+                              </button>
+                            </div>
+                          </li>
                           <li>Activate the plugin in WordPress admin</li>
                           <li>Go to Settings → WanGov ID</li>
                           <li>Enter your Client ID and Client Secret</li>

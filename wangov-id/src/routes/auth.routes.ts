@@ -9,7 +9,9 @@ import {
   requestPasswordReset,
   logout,
   refreshToken,
-  changePassword
+  changePassword,
+  oauthCallback,
+  downloadWordPressPlugin
 } from '../controllers/auth.controller';
 
 const router = Router();
@@ -22,6 +24,12 @@ router.post('/verify-phone', verifyPhone);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 router.post('/refresh-token', refreshToken);
+
+// OAuth routes
+router.post('/callback', oauthCallback);
+
+// WordPress plugin download
+router.get('/wordpress-plugin', downloadWordPressPlugin);
 
 // Protected routes
 router.use(authenticateCitizen);
