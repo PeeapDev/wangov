@@ -1,0 +1,137 @@
+// Simplified Prisma schema for SQLite local development
+// This is a minimal version for testing - production uses PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Simplified Citizen model
+model Citizen {
+  id                String            @id @default(uuid())
+  nid               String            @unique // National ID
+  firstName         String
+  middleName        String?
+  lastName          String
+  dateOfBirth       DateTime
+  gender            String            // "MALE", "FEMALE", "OTHER", "NOT_SPECIFIED"
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  email             String?
+  phone             String?
+  address           String?
+  isVerified        Boolean           @default(false)
+  
+  // Relations
+  wallets           Wallet[]
+  documents         Document[]
+  auditLogs         AuditLog[]
+}
+
+// Simplified Organization model
+model Organization {
+  id                String            @id @default(uuid())
+  name              String
+  type              String            // "GOVERNMENT", "FINANCIAL", etc.
+  contactEmail      String
+  isActive          Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Relations
+  wallets           Wallet[]
+  services          Service[]
+}
+
+// Simplified User model for authentication
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  password          String
+  role              String            // "citizen", "admin", "organization", etc.
+  isActive          Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Optional relations
+  citizenId         String?
+  organizationId    String?
+}
+
+// Simplified Wallet model
+model Wallet {
+  id                String            @id @default(uuid())
+  balance           Float             @default(0.0)
+  currency          String            @default("SLL")
+  isActive          Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Owner relations (one of these will be set)
+  citizenId         String?
+  citizen           Citizen?          @relation(fields: [citizenId], references: [id])
+  organizationId    String?
+  organization      Organization?     @relation(fields: [organizationId], references: [id])
+  
+  // Relations
+  sentTransactions      Transaction[] @relation("SenderWallet")
+  receivedTransactions  Transaction[] @relation("ReceiverWallet")
+}
+
+// Simplified Transaction model
+model Transaction {
+  id                String            @id @default(uuid())
+  amount            Float
+  currency          String            @default("SLL")
+  type              String            // "TRANSFER", "PAYMENT", "DEPOSIT", "WITHDRAWAL"
+  status            String            @default("PENDING") // "PENDING", "COMPLETED", "FAILED"
+  description       String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Relations
+  senderId          String
+  sender            Wallet            @relation("SenderWallet", fields: [senderId], references: [id])
+  receiverId        String
+  receiver          Wallet            @relation("ReceiverWallet", fields: [receiverId], references: [id])
+}
+
+// Simplified Service model
+model Service {
+  id                String            @id @default(uuid())
+  name              String
+  description       String?
+  organizationId    String
+  organization      Organization      @relation(fields: [organizationId], references: [id])
+  isActive          Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+// Simplified Document model
+model Document {
+  id                String            @id @default(uuid())
+  type              String            // "NATIONAL_ID", "PASSPORT", etc.
+  documentNumber    String
+  citizenId         String
+  citizen           Citizen           @relation(fields: [citizenId], references: [id])
+  isVerified        Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+// Simplified Audit Log model
+model AuditLog {
+  id                String            @id @default(uuid())
+  action            String
+  entityType        String
+  entityId          String
+  details           String?           // JSON as string
+  citizenId         String?
+  citizen           Citizen?          @relation(fields: [citizenId], references: [id])
+  createdAt         DateTime          @default(now())
+}

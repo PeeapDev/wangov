@@ -38,16 +38,15 @@ const OAuthCallback: React.FC = () => {
           return;
         }
 
-        // Exchange authorization code for tokens
-        const response = await fetch('http://localhost:3010/auth/token', {
+        // Exchange authorization code for tokens via backend
+        const response = await fetch('http://localhost:3004/api/auth/callback', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
           },
-          body: new URLSearchParams({
-            grant_type: 'authorization_code',
+          body: JSON.stringify({
             code: code,
-            redirect_uri: `${window.location.origin}/auth/callback`,
+            state: state,
             client_id: sessionStorage.getItem('oauth_client_id') || 'wangov-universal',
           }),
         });
@@ -58,12 +57,35 @@ const OAuthCallback: React.FC = () => {
 
         const tokenData = await response.json();
         
-        // Store tokens
-        if (tokenData.access_token) {
-          localStorage.setItem('token', tokenData.access_token);
-          if (tokenData.refresh_token) {
-            localStorage.setItem('refresh_token', tokenData.refresh_token);
+        // Store tokens and user data
+        if (tokenData.status === 'success' && tokenData.data?.token) {
+          // Store for main auth system
+          localStorage.setItem('token', tokenData.data.token);
+          
+          // Store user data if provided
+          if (tokenData.data.user) {
+            localStorage.setItem('user', JSON.stringify(tokenData.data.user));
+            
+            // Only store ssoService data for provider portals
+            if (tokenData.data.user.role === 'provider-admin') {
+              // Also store for ssoService (provider portal compatibility)
+              localStorage.setItem('wangov_sso_token', tokenData.data.token);
+              
+              // Convert user data to ssoService format
+              const ssoUser = {
+                id: tokenData.data.user.id,
+                email: tokenData.data.user.email,
+                name: `${tokenData.data.user.firstName} ${tokenData.data.user.lastName}`,
+                role: tokenData.data.user.role,
+                permissions: ['provider-admin', 'admin'] // Grant necessary permissions
+              };
+              localStorage.setItem('wangov_sso_user', JSON.stringify(ssoUser));
+            }
           }
+          
+          console.log('OAuth authentication successful:', tokenData);
+        } else {
+          throw new Error('Invalid token response from backend');
         }
 
         // Clean up OAuth session data

@@ -34,9 +34,9 @@ class WanGovID {
      * Plugin settings - like Google OAuth
      */
     private $settings = [
-        'client_id' => '',
-        'client_secret' => '',
-        'enabled' => false,
+        'client_id' => 'wangov-universal',
+        'client_secret' => 'wangov-universal-secret',
+        'enabled' => true,
         'auto_create_users' => true,
         'button_text' => 'Login with WanGov ID',
         'show_on_login_page' => true,
@@ -50,6 +50,14 @@ class WanGovID {
         'auth_endpoint' => '/auth/authorize',
         'token_endpoint' => '/auth/token',
         'status_endpoint' => '/auth/status',
+    ];
+    
+    /**
+     * WanGov backend API configuration
+     */
+    private $backend_config = [
+        'api_url' => 'http://localhost:3004',
+        'oauth_callback_endpoint' => '/api/auth/callback',
     ];
 
     /**
@@ -381,24 +389,24 @@ class WanGovID {
     }
 
     /**
-     * Exchange authorization code for token
+     * Exchange authorization code for token via WanGov backend
      */
     private function exchange_code_for_token($code) {
-        $url = $this->sso_config['server_url'] . $this->sso_config['token_endpoint'];
-        $redirect_uri = site_url('/wangov-auth/callback');
+        $url = $this->backend_config['api_url'] . $this->backend_config['oauth_callback_endpoint'];
         
-        $body = array(
-            'grant_type' => 'authorization_code',
+        // Get state from session for backend processing
+        $state = isset($_SESSION['wangov_oauth_state']) ? $_SESSION['wangov_oauth_state'] : '';
+        
+        $body = json_encode(array(
             'code' => $code,
-            'client_id' => $this->settings['client_id'],
-            'client_secret' => $this->settings['client_secret'],
-            'redirect_uri' => $redirect_uri,
-        );
+            'state' => $state,
+            'client_id' => $this->settings['client_id'] ?: 'wangov-universal',
+        ));
         
         $response = wp_remote_post($url, array(
             'body' => $body,
             'headers' => array(
-                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Content-Type' => 'application/json',
             ),
         ));
         
@@ -408,6 +416,15 @@ class WanGovID {
         }
         
         $data = json_decode(wp_remote_retrieve_body($response), true);
+        
+        // Handle the new backend response format
+        if (isset($data['status']) && $data['status'] === 'success' && isset($data['data'])) {
+            return array(
+                'access_token' => $data['data']['token'],
+                'user' => $data['data']['user']
+            );
+        }
+        
         return $data;
     }
 

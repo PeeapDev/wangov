@@ -1,0 +1,4 @@
+ingress:
+  - service: https://wangov-production.up.railway.app
+    originRequest:
+      httpHostHeader: wangov-production.up.railway.app

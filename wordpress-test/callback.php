@@ -2,7 +2,7 @@
 session_start();
 
 // Configuration
-$sso_server = 'http://localhost:3010';
+$backend_api = 'http://localhost:3004';
 $client_id = 'wangov-universal';
 $redirect_uri = 'http://localhost:8080/callback.php';
 
@@ -16,23 +16,25 @@ if (!isset($_SESSION['oauth_state']) || $_SESSION['oauth_state'] !== $_GET['stat
     die('Invalid state parameter');
 }
 
+// Get state for backend processing
+$state = $_SESSION['oauth_state'];
+
 // Clear state from session
 unset($_SESSION['oauth_state']);
 
-// Exchange code for token
-$token_url = $sso_server . '/auth/token';
+// Exchange code for token via WanGov backend
+$token_url = $backend_api . '/api/auth/callback';
 $post_data = [
-    'grant_type' => 'authorization_code',
     'code' => $_GET['code'],
-    'client_id' => $client_id,
-    'redirect_uri' => $redirect_uri
+    'state' => $state,
+    'client_id' => $client_id
 ];
 
 $context = stream_context_create([
     'http' => [
         'method' => 'POST',
-        'header' => 'Content-Type: application/x-www-form-urlencoded',
-        'content' => http_build_query($post_data)
+        'header' => 'Content-Type: application/json',
+        'content' => json_encode($post_data)
     ]
 ]);
 
@@ -44,14 +46,18 @@ if ($response === false) {
 
 $token_data = json_decode($response, true);
 
-if (!$token_data || isset($token_data['error'])) {
-    die('Token exchange failed: ' . ($token_data['error_description'] ?? 'Unknown error'));
+if (!$token_data || $token_data['status'] !== 'success') {
+    die('Token exchange failed: ' . ($token_data['message'] ?? 'Unknown error'));
 }
 
+// Extract user and token from backend response
+$access_token = $token_data['data']['token'];
+$user_data = $token_data['data']['user'];
+
 // Store user data in session
-if (isset($token_data['user'])) {
-    $_SESSION['wangov_user'] = $token_data['user'];
-    $_SESSION['wangov_access_token'] = $token_data['access_token'];
+if (isset($user_data)) {
+    $_SESSION['wangov_user'] = $user_data;
+    $_SESSION['wangov_access_token'] = $access_token;
 }
 
 // Redirect back to main page

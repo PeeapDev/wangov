@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: wangov-postgres-dev
+    environment:
+      POSTGRES_USER: wangov_dev
+      POSTGRES_PASSWORD: dev_password_123
+      POSTGRES_DB: wangov_id
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wangov_dev -d wangov_id"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
